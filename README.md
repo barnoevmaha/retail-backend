@@ -36,6 +36,14 @@ Business logic lives in services, never in routers. All quantity changes go thro
 | SMS_PROVIDER | mock | SMS provider (mock/...) |
 | TELEGRAM_BOT_TOKEN | | Bot token for notifications |
 | COMPANY_NAME | Clothes Shop | Display name |
+| SUPER_ADMIN_EMAIL | admin@example.com | Super admin email (dev placeholder) |
+| SUPER_ADMIN_PASSWORD | ChangeMe123! | Super admin password (dev placeholder) |
+| MANAGER_EMAIL | manager@example.com | Manager email (dev placeholder) |
+| MANAGER_PASSWORD | ChangeMe123! | Manager password (dev placeholder) |
+| CASHIER_EMAIL | cashier@example.com | Cashier email (dev placeholder) |
+| CASHIER_PASSWORD | ChangeMe123! | Cashier password (dev placeholder) |
+| WAREHOUSE_EMAIL | warehouse@example.com | Warehouse email (dev placeholder) |
+| WAREHOUSE_PASSWORD | ChangeMe123! | Warehouse password (dev placeholder) |
 
 ## Development
 
@@ -75,9 +83,28 @@ python -m app.seed
 1. Push this repo to GitHub
 2. In Railway, create a new project from the repo
 3. Add PostgreSQL plugin (Railway sets DATABASE_URL automatically)
-4. Set required env vars: SECRET_KEY
+4. Set required env vars: `SECRET_KEY`, and the seed credential vars below
 5. Run one-off command: `python -m app.seed`
 6. Done
+
+### Production Credentials ⚠️
+
+The seed creates default users from environment variables. **Never hardcode credentials in the repository.**
+
+Set these on Railway (never in `.env.example` or committed files):
+
+| Variable | Purpose |
+|----------|---------|
+| `SUPER_ADMIN_EMAIL` | Super admin login email |
+| `SUPER_ADMIN_PASSWORD` | Super admin password |
+| `MANAGER_EMAIL` | Manager login email |
+| `MANAGER_PASSWORD` | Manager password |
+| `CASHIER_EMAIL` | Cashier login email |
+| `CASHIER_PASSWORD` | Cashier password |
+| `WAREHOUSE_EMAIL` | Warehouse employee login email |
+| `WAREHOUSE_PASSWORD` | Warehouse employee password |
+
+If any variable is unset, the seed uses safe development placeholders (`admin@example.com` / `ChangeMe123!`). These are clearly marked as dev-only defaults and must be overridden in production.
 
 ## Health Check
 

@@ -15,6 +15,16 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 30
     company_name: str = "Clothes Shop"
 
+    # Seed credentials — env vars in production, safe placeholders otherwise
+    super_admin_email: str = "admin@example.com"
+    super_admin_password: str = "ChangeMe123!"
+    manager_email: str = "manager@example.com"
+    manager_password: str = "ChangeMe123!"
+    cashier_email: str = "cashier@example.com"
+    cashier_password: str = "ChangeMe123!"
+    warehouse_email: str = "warehouse@example.com"
+    warehouse_password: str = "ChangeMe123!"
+
     class Config:
         env_file = ".env"
 

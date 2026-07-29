@@ -1,5 +1,6 @@
 """Seed the database with initial data for development."""
 
+from app.core.config import settings
 from app.core.database import SessionLocal, engine, Base
 from app.core.security import hash_password
 from app.models.user import User
@@ -32,10 +33,10 @@ def seed():
         db.close()
         return
 
-    admin_user = User(email="admin@shop.com", password_hash=hash_password("admin123"), role="super_admin")
-    manager_user = User(email="manager@shop.com", password_hash=hash_password("manager123"), role="manager")
-    cashier_user = User(email="cashier@shop.com", password_hash=hash_password("cashier123"), role="cashier")
-    warehouse_user = User(email="warehouse@shop.com", password_hash=hash_password("warehouse123"), role="warehouse_employee")
+    admin_user = User(email=settings.super_admin_email, password_hash=hash_password(settings.super_admin_password), role="super_admin")
+    manager_user = User(email=settings.manager_email, password_hash=hash_password(settings.manager_password), role="manager")
+    cashier_user = User(email=settings.cashier_email, password_hash=hash_password(settings.cashier_password), role="cashier")
+    warehouse_user = User(email=settings.warehouse_email, password_hash=hash_password(settings.warehouse_password), role="warehouse_employee")
     db.add_all([admin_user, manager_user, cashier_user, warehouse_user])
     db.flush()
 
