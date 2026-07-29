@@ -15,6 +15,16 @@ async def lifespan(app: FastAPI):
         Base.metadata.create_all(bind=engine)
     except Exception:
         pass
+    from app.core.database import SessionLocal
+    from app.repositories.user_repo import UserRepository
+    db = SessionLocal()
+    try:
+        admin = UserRepository(db).get_by_email(settings.super_admin_email)
+        print(f"Loaded SUPER_ADMIN_EMAIL: {settings.super_admin_email}")
+        if not admin:
+            print(f"WARNING: Admin user '{settings.super_admin_email}' not found in database. Run seed first.")
+    finally:
+        db.close()
     yield
     engine.dispose()
 
@@ -83,3 +93,15 @@ app.include_router(customer_account.router)
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/api/debug/admin-exists")
+def debug_admin_exists():
+    from app.core.database import SessionLocal
+    from app.repositories.user_repo import UserRepository
+    db = SessionLocal()
+    try:
+        admin = UserRepository(db).get_by_email(settings.super_admin_email)
+        return {"exists": admin is not None, "email": settings.super_admin_email, "verified": admin is not None and admin.is_active}
+    finally:
+        db.close()
