@@ -1,0 +1,55 @@
+from fastapi import APIRouter, Depends, Header
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
+from app.core.database import get_db
+from app.core.dependencies import optional_current_user
+from app.models.user import User
+from app.repositories.customer_repo import CustomerRepository
+from app.services.cart_service import CartService
+from app.services.order_service import OrderService
+from app.services.promotion_service import PromotionService
+from app.schemas.order import OrderResponse
+
+router = APIRouter(prefix="/api/checkout", tags=["checkout"])
+
+
+class CheckoutRequest(BaseModel):
+    payment_method: str = "card"
+    promo_code: str | None = None
+
+
+@router.post("/", response_model=OrderResponse)
+def checkout(
+    body: CheckoutRequest,
+    db: Session = Depends(get_db),
+    user: User | None = Depends(optional_current_user),
+    x_session_key: str = Header(default=""),
+    x_customer_id: int | None = Header(default=None),
+):
+    customer_id = x_customer_id
+    if not customer_id and user:
+        customer = CustomerRepository(db).get_by_user_id(user.id)
+        if customer:
+            customer_id = customer.id
+
+    cart_svc = CartService(db)
+    cart = cart_svc.get_or_create_cart(customer_id=customer_id, session_key=x_session_key or None)
+
+    order_svc = OrderService(db)
+    order = order_svc.create_from_cart(
+        cart_id=cart.id,
+        customer_id=customer_id,
+        payment_method=body.payment_method,
+        user=user,
+    )
+
+    if body.promo_code:
+        try:
+            promo_svc = PromotionService(db)
+            promo_svc.validate_code(body.promo_code, float(order.total_amount))
+            promo_svc.use_code(body.promo_code)
+        except Exception:
+            pass
+
+    return OrderResponse.model_validate(order)
