@@ -1,6 +1,5 @@
 """Seed the database with initial data for development."""
-from app.core.config import settings
-from app.core.database import SessionLocal, engine, Base
+from app.core.database import SessionLocal
 from app.models.category import Category
 from app.models.brand import Brand
 from app.models.product import Product
@@ -23,7 +22,6 @@ import random
 
 
 def seed():
-    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
     admin = ensure_super_admin(db)
