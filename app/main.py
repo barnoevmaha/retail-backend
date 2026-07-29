@@ -16,13 +16,11 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
     from app.core.database import SessionLocal
-    from app.repositories.user_repo import UserRepository
+    from app.services.bootstrap_service import ensure_super_admin
     db = SessionLocal()
     try:
-        admin = UserRepository(db).get_by_email(settings.super_admin_email)
-        print(f"Loaded SUPER_ADMIN_EMAIL: {settings.super_admin_email}")
-        if not admin:
-            print(f"WARNING: Admin user '{settings.super_admin_email}' not found in database. Run seed first.")
+        ensure_super_admin(db)
+        db.commit()
     finally:
         db.close()
     yield
@@ -103,5 +101,31 @@ def debug_admin_exists():
     try:
         admin = UserRepository(db).get_by_email(settings.super_admin_email)
         return {"exists": admin is not None, "email": settings.super_admin_email, "verified": admin is not None and admin.is_active}
+    finally:
+        db.close()
+
+
+@app.get("/api/debug/users")
+def debug_users():
+    from app.core.database import SessionLocal
+    from app.repositories.user_repo import UserRepository
+    db = SessionLocal()
+    try:
+        users = UserRepository(db).list_all()
+        return [{"id": u.id, "email": u.email, "role": u.role, "active": u.is_active} for u in users]
+    finally:
+        db.close()
+
+
+@app.get("/api/debug/admin")
+def debug_admin():
+    from app.core.database import SessionLocal
+    from app.repositories.user_repo import UserRepository
+    db = SessionLocal()
+    try:
+        admin = UserRepository(db).get_by_email(settings.super_admin_email)
+        if not admin:
+            return {"exists": False, "email": settings.super_admin_email, "role": None, "password_hash_exists": False}
+        return {"exists": True, "email": admin.email, "role": admin.role, "password_hash_exists": bool(admin.password_hash)}
     finally:
         db.close()
