@@ -72,3 +72,18 @@ def update_customer(
         from fastapi import HTTPException, status
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
     return repo.update(customer, **body.model_dump(exclude_unset=True))
+
+
+@router.put("/{customer_id}/block")
+def block_customer(
+    customer_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("super_admin", "admin")),
+):
+    repo = CustomerRepository(db)
+    customer = repo.get_by_id(customer_id)
+    if not customer:
+        from fastapi import HTTPException, status
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
+    repo.update(customer, is_blocked=not customer.is_blocked)
+    return {"message": "Customer blocked" if customer.is_blocked else "Customer unblocked", "is_blocked": customer.is_blocked}

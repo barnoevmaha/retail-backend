@@ -5,8 +5,9 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_role
 from app.models.user import User
 from app.repositories.user_repo import UserRepository
-from app.schemas.user import UserCreate, UserUpdate, UserResponse
+from app.schemas.user import UserCreate, UserUpdate, UserResponse, ChangePasswordRequest
 from app.core.security import hash_password
+from app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -47,3 +48,15 @@ def update_user(
         update_data["password_hash"] = hash_password(update_data.pop("password"))
     updated = repo.update(user, **update_data)
     return UserResponse.model_validate(updated)
+
+
+@router.put("/me/change-password")
+def change_password(
+    body: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    AuthService(UserRepository(db), db).change_password(
+        user, body.current_password, body.new_password, body.confirm_password
+    )
+    return {"message": "Password changed successfully"}

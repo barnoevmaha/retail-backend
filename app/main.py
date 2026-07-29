@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.database import engine, Base
 from app.core.config import settings
-from app.routers import auth, users, products, variants, categories, brands, warehouse, customers, cart, checkout, orders, reviews, favorites, promotions, sms, analytics, suppliers, receiving, returns, writeoffs, adjustments, product_images, colors, sizes, audit_logs, notifications, pos_sessions, inventory_history, barcode_generator, receipts, settings as settings_router, company, export as export_data
+from app.routers import auth, users, products, variants, categories, brands, warehouse, customers, cart, checkout, orders, reviews, favorites, promotions, sms, analytics, suppliers, receiving, returns, writeoffs, adjustments, product_images, colors, sizes, audit_logs, notifications, pos_sessions, inventory_history, barcode_generator, receipts, settings as settings_router, company, export as export_data, customer_auth, customer_account
 
 
 @asynccontextmanager
@@ -76,6 +76,8 @@ app.include_router(inventory_history.router)
 app.include_router(barcode_generator.router)
 app.include_router(receipts.router)
 app.include_router(export_data.router)
+app.include_router(customer_auth.router)
+app.include_router(customer_account.router)
 
 
 @app.get("/api/health")

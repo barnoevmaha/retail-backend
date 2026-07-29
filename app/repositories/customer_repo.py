@@ -10,6 +10,9 @@ class CustomerRepository:
     def get_by_id(self, id: int) -> Customer | None:
         return self.db.query(Customer).filter(Customer.id == id).first()
 
+    def get_by_email(self, email: str) -> Customer | None:
+        return self.db.query(Customer).filter(Customer.email == email).first()
+
     def get_by_phone(self, phone: str) -> Customer | None:
         return self.db.query(Customer).filter(Customer.phone == phone).first()
 
@@ -17,7 +20,7 @@ class CustomerRepository:
         return self.db.query(Customer).filter(Customer.user_id == user_id).first()
 
     def list_all(self, skip: int = 0, limit: int = 50) -> list[Customer]:
-        return self.db.query(Customer).offset(skip).limit(limit).all()
+        return self.db.query(Customer).order_by(Customer.created_at.desc()).offset(skip).limit(limit).all()
 
     def create(self, **kwargs) -> Customer:
         c = Customer(**kwargs)
