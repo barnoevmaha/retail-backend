@@ -70,6 +70,7 @@ class CartService:
                 "variant_id": item.variant_id,
                 "quantity": item.quantity,
                 "price": price,
+                "product_name": name,
                 "name": name,
                 "size": variant.size if variant else None,
                 "color": variant.color if variant else None,

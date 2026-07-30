@@ -19,9 +19,19 @@ def list_products(
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
+    from app.models.category import Category
+    from app.models.brand import Brand
     service = ProductService(db)
     products, total = service.search_products(q, category_id, brand_id, skip, limit)
-    return {"items": [ProductResponse.model_validate(p) for p in products], "total": total}
+    items = []
+    for p in products:
+        d = ProductResponse.model_validate(p).model_dump()
+        cat = db.query(Category).filter(Category.id == p.category_id).first()
+        brd = db.query(Brand).filter(Brand.id == p.brand_id).first()
+        d["category_name"] = cat.name if cat else None
+        d["brand_name"] = brd.name if brd else None
+        items.append(d)
+    return {"items": items, "total": total}
 
 
 @router.get("/{slug}", response_model=ProductResponse)

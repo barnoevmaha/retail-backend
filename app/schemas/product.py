@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from app.schemas.variant import VariantResponse
+
 
 class ProductCreate(BaseModel):
     name: str
@@ -26,6 +28,9 @@ class ProductResponse(BaseModel):
     description: str | None
     brand_id: int | None
     category_id: int | None
+    category_name: str | None = None
+    brand_name: str | None = None
+    variants: list[VariantResponse] = []
     is_active: bool
     created_at: datetime
 
