@@ -15,6 +15,24 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 30
     company_name: str = "Clothes Shop"
 
+    # SMTP
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
+    smtp_use_tls: bool = True
+
+    # Eskiz SMS
+    eskiz_email: str = ""
+    eskiz_password: str = ""
+    eskiz_from: str = ""
+
+    # Twilio SMS
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_phone: str = ""
+
     # Seed credentials — env vars in production, safe placeholders otherwise
     super_admin_email: str = "admin@example.com"
     super_admin_password: str = "ChangeMe123!"

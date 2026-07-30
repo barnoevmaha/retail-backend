@@ -8,8 +8,9 @@ from app.models.customer import Customer
 from app.repositories.customer_repo import CustomerRepository
 from app.services.audit_service import AuditService
 from app.services.verification_service import VerificationService
-from app.services.email_provider import EmailProvider, MockEmailProvider
-from app.services.sms_service import SmsService, MockSmsProvider
+from app.services.email_provider import EmailProvider
+from app.services.sms_service import SmsService
+from app.services.provider_factory import get_email_provider, get_sms_service
 from app.schemas.customer import validate_password
 
 
@@ -32,11 +33,19 @@ class CustomerAuthService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No password set. Use social login.")
 
     def register_email_send(self, first_name: str, last_name: str, email: str):
-        if self.repo.get_by_email(email):
+        existing = self.repo.get_by_email(email)
+        if existing and existing.email_verified:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
-        customer = self.repo.create(first_name=first_name, last_name=last_name, email=email)
-        self.verification.send_email_code(email)
-        return {"message": "Verification code sent to email"}
+        is_resend = existing is not None
+        if not is_resend:
+            self.repo.create(first_name=first_name, last_name=last_name, email=email)
+        try:
+            self.verification.send_email_code(email)
+        except (ValueError, RuntimeError) as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        if is_resend:
+            return {"message": "A new verification code has been sent."}
+        return {"message": "Registration successful. We've sent a verification code to your email."}
 
     def register_email_verify(self, email: str, code: str, password: str, confirm_password: str):
         if password != confirm_password:
@@ -54,11 +63,19 @@ class CustomerAuthService:
         return {"access_token": self._token(customer), "token_type": "bearer", "customer": customer}
 
     def register_phone_send(self, first_name: str, last_name: str, phone: str):
-        if self.repo.get_by_phone(phone):
+        existing = self.repo.get_by_phone(phone)
+        if existing and existing.phone_verified:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Phone already registered")
-        customer = self.repo.create(first_name=first_name, last_name=last_name, phone=phone)
-        self.verification.send_phone_code(phone)
-        return {"message": "Verification code sent to phone"}
+        is_resend = existing is not None
+        if not is_resend:
+            self.repo.create(first_name=first_name, last_name=last_name, phone=phone)
+        try:
+            self.verification.send_phone_code(phone)
+        except (ValueError, RuntimeError) as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        if is_resend:
+            return {"message": "A new verification code has been sent."}
+        return {"message": "Registration successful. We've sent a verification code to your phone."}
 
     def register_phone_verify(self, phone: str, code: str, password: str, confirm_password: str):
         if password != confirm_password:
@@ -100,7 +117,7 @@ class CustomerAuthService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
         try:
             self.verification.send_reset_code(identifier)
-        except ValueError as e:
+        except (ValueError, RuntimeError) as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
         return {"message": "Reset code sent"}
 
@@ -119,7 +136,10 @@ class CustomerAuthService:
         if self.repo.get_by_email(email):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already in use")
         self.repo.update(customer, email=email)
-        self.verification.send_email_code(email)
+        try:
+            self.verification.send_email_code(email)
+        except (ValueError, RuntimeError) as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
         return {"message": "Verification code sent to email"}
 
     def link_email_verify(self, customer: Customer, email: str, code: str):
@@ -134,7 +154,10 @@ class CustomerAuthService:
         if self.repo.get_by_phone(phone):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Phone already in use")
         self.repo.update(customer, phone=phone)
-        self.verification.send_phone_code(phone)
+        try:
+            self.verification.send_phone_code(phone)
+        except (ValueError, RuntimeError) as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
         return {"message": "Verification code sent to phone"}
 
     def link_phone_verify(self, customer: Customer, phone: str, code: str):
