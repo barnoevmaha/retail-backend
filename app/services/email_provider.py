@@ -63,5 +63,11 @@ class SMTPEmailProvider(EmailProvider):
                 server.sendmail(settings.smtp_from, [recipient], msg.as_string())
             return True
         except Exception as e:
-            print(f"[SMTP ERROR] {e}")
+            print("========== SMTP ERROR ==========")
+            traceback.print_exc()
+            print("HOST:", settings.smtp_host)
+            print("PORT:", settings.smtp_port)
+            print("TLS:", settings.smtp_use_tls)
+            print("USER:", settings.smtp_username)
+            print("===============================")
             return False
