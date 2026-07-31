@@ -1,0 +1,632 @@
+[
+  {
+    "key": "${price}",
+    "en": "${price}",
+    "ru": "{price} ₽",
+    "uz": "{price} so'm"
+  },
+  {
+    "key": "000000",
+    "en": "000000",
+    "ru": "000000",
+    "uz": "000000"
+  },
+  {
+    "key": "A 6-digit code was sent to {target}",
+    "en": "A 6-digit code was sent to {target}",
+    "ru": "6-значный код отправлен на {target}",
+    "uz": "{target} ga 6 xonali kod yuborildi"
+  },
+  {
+    "key": "A new verification code has been sent.",
+    "en": "A new verification code has been sent.",
+    "ru": "Новый код подтверждения отправлен.",
+    "uz": "Yangi tasdiqlash kodi yuborildi."
+  },
+  {
+    "key": "Account",
+    "en": "Account",
+    "ru": "Аккаунт",
+    "uz": "Akkaunt"
+  },
+  {
+    "key": "Account is locked. Try again in 15 minutes.",
+    "en": "Account is locked. Try again in 15 minutes.",
+    "ru": "Аккаунт заблокирован. Попробуйте через 15 минут.",
+    "uz": "Akkaunt bloklangan. 15 daqiqadan so'ng urinib ko'ring."
+  },
+  {
+    "key": "Add Address",
+    "en": "Add Address",
+    "ru": "Добавить адрес",
+    "uz": "Manzil qo'shish"
+  },
+  {
+    "key": "Add to Cart",
+    "en": "Add to Cart",
+    "ru": "В корзину",
+    "uz": "Savatga qo'shish"
+  },
+  {
+    "key": "Added to cart",
+    "en": "Added to cart",
+    "ru": "Добавлено в корзину",
+    "uz": "Savatga qo'shildi"
+  },
+  {
+    "key": "Adding...",
+    "en": "Adding...",
+    "ru": "Добавление...",
+    "uz": "Qo'shilmoqda..."
+  },
+  {
+    "key": "Address added",
+    "en": "Address added",
+    "ru": "Адрес добавлен",
+    "uz": "Manzil qo'shildi"
+  },
+  {
+    "key": "Addresses",
+    "en": "Addresses",
+    "ru": "Адреса",
+    "uz": "Manzillar"
+  },
+  {
+    "key": "All",
+    "en": "All",
+    "ru": "Все",
+    "uz": "Barchasi"
+  },
+  {
+    "key": "Already have an account?",
+    "en": "Already have an account?",
+    "ru": "Уже есть аккаунт?",
+    "uz": "Akkauntingiz bormi?"
+  },
+  {
+    "key": "An error occurred",
+    "en": "An error occurred",
+    "ru": "Произошла ошибка",
+    "uz": "Xatolik yuz berdi"
+  },
+  {
+    "key": "Apartment",
+    "en": "Apartment",
+    "ru": "Квартира",
+    "uz": "Xonadon"
+  },
+  {
+    "key": "At least 8 characters",
+    "en": "At least 8 characters",
+    "ru": "Минимум 8 символов",
+    "uz": "Kamida 8 belgi"
+  },
+  {
+    "key": "Back",
+    "en": "Back",
+    "ru": "Назад",
+    "uz": "Orqaga"
+  },
+  {
+    "key": "Back to Sign In",
+    "en": "Back to Sign In",
+    "ru": "Назад к входу",
+    "uz": "Kirishga qaytish"
+  },
+  {
+    "key": "Birthday",
+    "en": "Birthday",
+    "ru": "Дата рождения",
+    "uz": "Tug'ilgan kun"
+  },
+  {
+    "key": "Cart",
+    "en": "Cart",
+    "ru": "Корзина",
+    "uz": "Savat"
+  },
+  {
+    "key": "Catalog",
+    "en": "Catalog",
+    "ru": "Каталог",
+    "uz": "Katalog"
+  },
+  {
+    "key": "Checkout",
+    "en": "Checkout",
+    "ru": "Оформить заказ",
+    "uz": "Rasmiylashtirish"
+  },
+  {
+    "key": "City",
+    "en": "City",
+    "ru": "Город",
+    "uz": "Shahar"
+  },
+  {
+    "key": "Clothes Shop",
+    "en": "Clothes Shop",
+    "ru": "Магазин одежды",
+    "uz": "Kiyim do'koni"
+  },
+  {
+    "key": "Confirm Password",
+    "en": "Confirm Password",
+    "ru": "Подтвердите пароль",
+    "uz": "Parolni tasdiqlang"
+  },
+  {
+    "key": "Continue with Email",
+    "en": "Continue with Email",
+    "ru": "Продолжить с Email",
+    "uz": "Email bilan davom etish"
+  },
+  {
+    "key": "Continue with Phone",
+    "en": "Continue with Phone",
+    "ru": "Продолжить с телефона",
+    "uz": "Telefon bilan davom etish"
+  },
+  {
+    "key": "Country",
+    "en": "Country",
+    "ru": "Страна",
+    "uz": "Davlat"
+  },
+  {
+    "key": "Create Account",
+    "en": "Create Account",
+    "ru": "Создать аккаунт",
+    "uz": "Akkaunt yaratish"
+  },
+  {
+    "key": "Create one",
+    "en": "Create one",
+    "ru": "Создать",
+    "uz": "Yaratish"
+  },
+  {
+    "key": "Dark",
+    "en": "Dark",
+    "ru": "Темная",
+    "uz": "Qorong'i"
+  },
+  {
+    "key": "Default Billing",
+    "en": "Default Billing",
+    "ru": "Оплата по умолчанию",
+    "uz": "Standart to'lov"
+  },
+  {
+    "key": "Default Shipping",
+    "en": "Default Shipping",
+    "ru": "Доставка по умолчанию",
+    "uz": "Standart yetkazib berish"
+  },
+  {
+    "key": "Delete",
+    "en": "Delete",
+    "ru": "Удалить",
+    "uz": "O'chirish"
+  },
+  {
+    "key": "Discover the latest fashion trends",
+    "en": "Discover the latest fashion trends",
+    "ru": "Откройте для себя последние модные тенденции",
+    "uz": "Eng so'nggi moda trendlarini kashf eting"
+  },
+  {
+    "key": "Don't have an account?",
+    "en": "Don't have an account?",
+    "ru": "Нет аккаунта?",
+    "uz": "Akkauntingiz yo'qmi?"
+  },
+  {
+    "key": "Email",
+    "en": "Email",
+    "ru": "Email",
+    "uz": "Email"
+  },
+  {
+    "key": "Email or phone",
+    "en": "Email or phone",
+    "ru": "Email или телефон",
+    "uz": "Email yoki telefon"
+  },
+  {
+    "key": "Email verified: {value}",
+    "en": "Email verified: {value}",
+    "ru": "Email подтвержден: {value}",
+    "uz": "Email tasdiqlangan: {value}"
+  },
+  {
+    "key": "Email: {value}",
+    "en": "Email: {value}",
+    "ru": "Email: {value}",
+    "uz": "Email: {value}"
+  },
+  {
+    "key": "Enter Code",
+    "en": "Enter Code",
+    "ru": "Введите код",
+    "uz": "Kodni kiriting"
+  },
+  {
+    "key": "Enter your email or phone number to receive a reset code.",
+    "en": "Enter your email or phone number to receive a reset code.",
+    "ru": "Введите email или номер телефона для получения кода сброса.",
+    "uz": "Email yoki telefon raqamingizni kiriting."
+  },
+  {
+    "key": "Featured Products",
+    "en": "Featured Products",
+    "ru": "Рекомендуемые товары",
+    "uz": "Tavsiya etilgan mahsulotlar"
+  },
+  {
+    "key": "Female",
+    "en": "Female",
+    "ru": "Женский",
+    "uz": "Ayol"
+  },
+  {
+    "key": "First Name",
+    "en": "First Name",
+    "ru": "Имя",
+    "uz": "Ism"
+  },
+  {
+    "key": "Forgot Password",
+    "en": "Forgot Password",
+    "ru": "Забыли пароль",
+    "uz": "Parolni unutdingizmi"
+  },
+  {
+    "key": "Forgot password?",
+    "en": "Forgot password?",
+    "ru": "Забыли пароль?",
+    "uz": "Parolni unutdingizmi?"
+  },
+  {
+    "key": "Gender",
+    "en": "Gender",
+    "ru": "Пол",
+    "uz": "Jins"
+  },
+  {
+    "key": "Go to Market",
+    "en": "Go to Market",
+    "ru": "Перейти в магазин",
+    "uz": "Do'konga o'tish"
+  },
+  {
+    "key": "House",
+    "en": "House",
+    "ru": "Дом",
+    "uz": "Uy"
+  },
+  {
+    "key": "Invalid credentials",
+    "en": "Invalid credentials",
+    "ru": "Неверные данные",
+    "uz": "Noto'g'ri ma'lumotlar"
+  },
+  {
+    "key": "Language",
+    "en": "Language",
+    "ru": "Язык",
+    "uz": "Til"
+  },
+  {
+    "key": "Last Name",
+    "en": "Last Name",
+    "ru": "Фамилия",
+    "uz": "Familiya"
+  },
+  {
+    "key": "Light",
+    "en": "Light",
+    "ru": "Светлая",
+    "uz": "Yorug'"
+  },
+  {
+    "key": "Logout",
+    "en": "Logout",
+    "ru": "Выйти",
+    "uz": "Chiqish"
+  },
+  {
+    "key": "Loyalty: {level} ({points} pts)",
+    "en": "Loyalty: {level} ({points} pts)",
+    "ru": "Уровень: {level} ({points} баллов)",
+    "uz": "Daraja: {level} ({points} ball)"
+  },
+  {
+    "key": "Male",
+    "en": "Male",
+    "ru": "Мужской",
+    "uz": "Erkak"
+  },
+  {
+    "key": "My Account",
+    "en": "My Account",
+    "ru": "Мой аккаунт",
+    "uz": "Mening akkauntim"
+  },
+  {
+    "key": "New Password",
+    "en": "New Password",
+    "ru": "Новый пароль",
+    "uz": "Yangi parol"
+  },
+  {
+    "key": "No email linked. Contact support to add one.",
+    "en": "No email linked. Contact support to add one.",
+    "ru": "Email не привязан. Обратитесь в поддержку.",
+    "uz": "Email bog'lanmagan. Qo'llab-quvvatlash xizmatiga murojaat qiling."
+  },
+  {
+    "key": "No phone linked. Contact support to add one.",
+    "en": "No phone linked. Contact support to add one.",
+    "ru": "Телефон не привязан. Обратитесь в поддержку.",
+    "uz": "Telefon bog'lanmagan. Qo'llab-quvvatlash xizmatiga murojaat qiling."
+  },
+  {
+    "key": "Other",
+    "en": "Other",
+    "ru": "Другой",
+    "uz": "Boshqa"
+  },
+  {
+    "key": "Out of stock",
+    "en": "Out of stock",
+    "ru": "Нет в наличии",
+    "uz": "Mavjud emas"
+  },
+  {
+    "key": "Password",
+    "en": "Password",
+    "ru": "Пароль",
+    "uz": "Parol"
+  },
+  {
+    "key": "Password must be at least 8 characters",
+    "en": "Password must be at least 8 characters",
+    "ru": "Пароль должен быть минимум 8 символов",
+    "uz": "Parol kamida 8 belgidan iborat bo'lishi kerak"
+  },
+  {
+    "key": "Password Reset",
+    "en": "Password Reset",
+    "ru": "Пароль сброшен",
+    "uz": "Parol tiklandi"
+  },
+  {
+    "key": "Password reset successfully. You can now sign in.",
+    "en": "Password reset successfully. You can now sign in.",
+    "ru": "Пароль успешно сброшен. Теперь вы можете войти.",
+    "uz": "Parol muvaffaqiyatli tiklandi."
+  },
+  {
+    "key": "Passwords do not match",
+    "en": "Passwords do not match",
+    "ru": "Пароли не совпадают",
+    "uz": "Parollar mos kelmaydi"
+  },
+  {
+    "key": "Phone number",
+    "en": "Phone number",
+    "ru": "Номер телефона",
+    "uz": "Telefon raqam"
+  },
+  {
+    "key": "Phone verified: {value}",
+    "en": "Phone verified: {value}",
+    "ru": "Телефон подтвержден: {value}",
+    "uz": "Telefon tasdiqlangan: {value}"
+  },
+  {
+    "key": "Phone: {value}",
+    "en": "Phone: {value}",
+    "ru": "Телефон: {value}",
+    "uz": "Telefon: {value}"
+  },
+  {
+    "key": "Postal Code",
+    "en": "Postal Code",
+    "ru": "Индекс",
+    "uz": "Pochta indeksi"
+  },
+  {
+    "key": "Prefer not to say",
+    "en": "Prefer not to say",
+    "ru": "Не указан",
+    "uz": "Ko'rsatilmagan"
+  },
+  {
+    "key": "Profile",
+    "en": "Profile",
+    "ru": "Профиль",
+    "uz": "Profil"
+  },
+  {
+    "key": "Profile updated",
+    "en": "Profile updated",
+    "ru": "Профиль обновлен",
+    "uz": "Profil yangilandi"
+  },
+  {
+    "key": "Qty: {qty}",
+    "en": "Qty: {qty}",
+    "ru": "Кол-во: {qty}",
+    "uz": "Soni: {qty}"
+  },
+  {
+    "key": "Receiver Name",
+    "en": "Receiver Name",
+    "ru": "Получатель",
+    "uz": "Qabul qiluvchi"
+  },
+  {
+    "key": "Receiver Phone",
+    "en": "Receiver Phone",
+    "ru": "Телефон получателя",
+    "uz": "Qabul qiluvchi telefoni"
+  },
+  {
+    "key": "Registration completed successfully.",
+    "en": "Registration completed successfully.",
+    "ru": "Регистрация успешно завершена.",
+    "uz": "Ro'yxatdan o'tish muvaffaqiyatli yakunlandi."
+  },
+  {
+    "key": "Registration successful. We've sent a verification code to your {target}.",
+    "en": "Registration successful. We've sent a verification code to your {target}.",
+    "ru": "Регистрация успешна. Код подтверждения отправлен на ваш {target}.",
+    "uz": "Ro'yxatdan o'tish muvaffaqiyatli. {target} ga tasdiqlash kodi yuborildi."
+  },
+  {
+    "key": "Remove",
+    "en": "Remove",
+    "ru": "Удалить",
+    "uz": "O'chirish"
+  },
+  {
+    "key": "Reset code sent. Check your email or phone.",
+    "en": "Reset code sent. Check your email or phone.",
+    "ru": "Код сброса отправлен. Проверьте email или телефон.",
+    "uz": "Tiklash kodi yuborildi."
+  },
+  {
+    "key": "Reset Password",
+    "en": "Reset Password",
+    "ru": "Сброс пароля",
+    "uz": "Parolni tiklash"
+  },
+  {
+    "key": "Resetting...",
+    "en": "Resetting...",
+    "ru": "Сброс...",
+    "uz": "Tiklanmoqda..."
+  },
+  {
+    "key": "Save",
+    "en": "Save",
+    "ru": "Сохранить",
+    "uz": "Saqlash"
+  },
+  {
+    "key": "Saving...",
+    "en": "Saving...",
+    "ru": "Сохранение...",
+    "uz": "Saqlanmoqda..."
+  },
+  {
+    "key": "Search products...",
+    "en": "Search products...",
+    "ru": "Поиск товаров...",
+    "uz": "Mahsulotlarni qidirish..."
+  },
+  {
+    "key": "Security",
+    "en": "Security",
+    "ru": "Безопасность",
+    "uz": "Xavfsizlik"
+  },
+  {
+    "key": "Send Reset Code",
+    "en": "Send Reset Code",
+    "ru": "Отправить код",
+    "uz": "Kodni yuborish"
+  },
+  {
+    "key": "Send Verification Code",
+    "en": "Send Verification Code",
+    "ru": "Отправить код",
+    "uz": "Kodni yuborish"
+  },
+  {
+    "key": "Sending...",
+    "en": "Sending...",
+    "ru": "Отправка...",
+    "uz": "Yuborilmoqda..."
+  },
+  {
+    "key": "Shop Now",
+    "en": "Shop Now",
+    "ru": "В магазин",
+    "uz": "Do'konga"
+  },
+  {
+    "key": "Shopping Cart",
+    "en": "Shopping Cart",
+    "ru": "Корзина",
+    "uz": "Savat"
+  },
+  {
+    "key": "Sign In",
+    "en": "Sign In",
+    "ru": "Войти",
+    "uz": "Kirish"
+  },
+  {
+    "key": "Signing in...",
+    "en": "Signing in...",
+    "ru": "Вход...",
+    "uz": "Kirish..."
+  },
+  {
+    "key": "Street",
+    "en": "Street",
+    "ru": "Улица",
+    "uz": "Ko'cha"
+  },
+  {
+    "key": "Subscribe to newsletter",
+    "en": "Subscribe to newsletter",
+    "ru": "Подписаться на рассылку",
+    "uz": "Yangiliklarga obuna bo'lish"
+  },
+  {
+    "key": "System",
+    "en": "System",
+    "ru": "Системная",
+    "uz": "Tizim"
+  },
+  {
+    "key": "Timezone",
+    "en": "Timezone",
+    "ru": "Часовой пояс",
+    "uz": "Vaqt mintaqasi"
+  },
+  {
+    "key": "Total: ${total}",
+    "en": "Total: ${total}",
+    "ru": "Итого: {total} ₽",
+    "uz": "Jami: {total} so'm"
+  },
+  {
+    "key": "Verifying...",
+    "en": "Verifying...",
+    "ru": "Проверка...",
+    "uz": "Tekshirilmoqda..."
+  },
+  {
+    "key": "Welcome to Clothes Shop",
+    "en": "Welcome to Clothes Shop",
+    "ru": "Добро пожаловать в магазин одежды",
+    "uz": "Kiyim do'koniga xush kelibsiz"
+  },
+  {
+    "key": "Your account has been verified successfully.",
+    "en": "Your account has been verified successfully.",
+    "ru": "Ваш аккаунт успешно подтвержден.",
+    "uz": "Akkauntingiz muvaffaqiyatli tasdiqlandi."
+  },
+  {
+    "key": "Your cart is empty",
+    "en": "Your cart is empty",
+    "ru": "Корзина пуста",
+    "uz": "Savat bo'sh"
+  }
+]

@@ -27,3 +27,4 @@ from app.models.pos_session import PosSession
 from app.models.setting import Setting
 from app.models.company import Company
 from app.models.receipt import Receipt, ReceiptItem
+from app.models.translation import Translation

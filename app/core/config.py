@@ -20,6 +20,15 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     email_from: str = ""
 
+    # Translation (auto-translate UI strings EN -> RU/UZ; provider auto-detected by key)
+    translation_provider: str = ""  # gemini | openai | deepl | google | "" (auto)
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-3.5-flash"
+    openai_api_key: str = ""
+    openai_model: str = "gpt-4o-mini"
+    deepl_api_key: str = ""
+    google_translate_api_key: str = ""
+
     # Eskiz SMS
     eskiz_email: str = ""
     eskiz_password: str = ""
