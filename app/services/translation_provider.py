@@ -1,14 +1,19 @@
 import html
 import json
 import logging
+import ssl
 import urllib.parse
 import urllib.request
 import urllib.error
 from abc import ABC, abstractmethod
 
+import certifi
+
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
+
+_SSL_CTX = ssl.create_default_context(cafile=certifi.where())
 
 
 class TranslationProviderError(Exception):
@@ -31,14 +36,14 @@ def _post_json(url: str, payload: dict, headers: dict | None = None, timeout: in
         headers={"Content-Type": "application/json", **(headers or {})},
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
+    with urllib.request.urlopen(req, timeout=timeout, context=_SSL_CTX) as resp:
         return json.loads(resp.read())
 
 
 def _post_form(url: str, fields: dict, headers: dict | None = None, timeout: int = 20):
     body = urllib.parse.urlencode(fields, doseq=True).encode()
     req = urllib.request.Request(url, data=body, headers=headers or {}, method="POST")
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
+    with urllib.request.urlopen(req, timeout=timeout, context=_SSL_CTX) as resp:
         return json.loads(resp.read())
 
 
@@ -163,30 +168,29 @@ class GoogleTranslateProvider(TranslationProvider):
             raise TranslationProviderError(f"unexpected Google response: {e}") from e
 
 
-def get_translation_provider() -> TranslationProvider | None:
-    """Return the configured provider, or the first one with an API key set."""
-    providers = {
-        "gemini": lambda: GeminiProvider(settings.gemini_api_key, settings.gemini_model)
-        if settings.gemini_api_key
-        else None,
-        "openai": lambda: OpenAIProvider(settings.openai_api_key, settings.openai_model)
-        if settings.openai_api_key
-        else None,
-        "deepl": lambda: DeepLProvider(settings.deepl_api_key) if settings.deepl_api_key else None,
-        "google": lambda: GoogleTranslateProvider(settings.google_translate_api_key)
-        if settings.google_translate_api_key
-        else None,
-    }
+def get_translation_providers() -> list[TranslationProvider]:
+    """All configured providers, in priority order (gemini -> openai -> deepl -> google)."""
+    def make(name: str):
+        if name == "gemini":
+            return GeminiProvider(settings.gemini_api_key, settings.gemini_model) if settings.gemini_api_key else None
+        if name == "openai":
+            return OpenAIProvider(settings.openai_api_key, settings.openai_model) if settings.openai_api_key else None
+        if name == "deepl":
+            return DeepLProvider(settings.deepl_api_key) if settings.deepl_api_key else None
+        if name == "google":
+            return GoogleTranslateProvider(settings.google_translate_api_key) if settings.google_translate_api_key else None
+        return None
+
+    names = ["gemini", "openai", "deepl", "google"]
     if settings.translation_provider:
-        selected = providers.get(settings.translation_provider)
-        if selected:
-            provider = selected()
-            if provider:
-                return provider
-            logger.warning("TRANSLATION_PROVIDER=%s set but no API key configured", settings.translation_provider)
-    for name, make in providers.items():
-        provider = make()
-        if provider:
-            logger.info("Using translation provider: %s", name)
-            return provider
-    return None
+        names = [settings.translation_provider, *[n for n in names if n != settings.translation_provider]]
+    providers = [p for n in names for p in [make(n)] if p]
+    if not providers:
+        logger.warning("No translation provider configured — strings will stay English")
+    return providers
+
+
+def get_translation_provider() -> TranslationProvider | None:
+    """First configured provider, or None."""
+    providers = get_translation_providers()
+    return providers[0] if providers else None
