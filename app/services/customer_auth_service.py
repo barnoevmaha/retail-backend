@@ -21,6 +21,13 @@ class CustomerAuthService:
         self.audit = AuditService(db)
         self.verification = VerificationService(db, email_provider, sms_service)
 
+    @staticmethod
+    def _validate_password(password: str) -> None:
+        try:
+            validate_password(password)
+        except ValueError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
     def _token(self, customer: Customer) -> str:
         return create_access_token({"sub": f"customer_{customer.id}", "role": "customer"})
 
@@ -50,7 +57,7 @@ class CustomerAuthService:
     def register_email_verify(self, email: str, code: str, password: str, confirm_password: str):
         if password != confirm_password:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match")
-        validate_password(password)
+        self._validate_password(password)
         customer = self.repo.get_by_email(email)
         if not customer:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No registration found for this email")
@@ -80,7 +87,7 @@ class CustomerAuthService:
     def register_phone_verify(self, phone: str, code: str, password: str, confirm_password: str):
         if password != confirm_password:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match")
-        validate_password(password)
+        self._validate_password(password)
         customer = self.repo.get_by_phone(phone)
         if not customer:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No registration found for this phone")
@@ -124,7 +131,7 @@ class CustomerAuthService:
     def reset_password(self, identifier: str, code: str, new_password: str, confirm_password: str):
         if new_password != confirm_password:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match")
-        validate_password(new_password)
+        self._validate_password(new_password)
         if not self.verification.verify_reset_code(identifier, code):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired reset code")
         customer = self.verification.get_customer_by_identifier(identifier)
