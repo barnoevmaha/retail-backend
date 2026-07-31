@@ -45,6 +45,7 @@ class MockEmailProvider(EmailProvider):
         print(f"[EMAIL MOCK] To: {recipient}, Subject: {subject}, Body: {body}")
         return True
 
+import traceback
 
 class SMTPEmailProvider(EmailProvider):
     def send(self, recipient: str, subject: str, body: str) -> bool:
