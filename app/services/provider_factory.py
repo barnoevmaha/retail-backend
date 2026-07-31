@@ -1,13 +1,17 @@
 from app.core.config import settings
-from app.services.email_provider import EmailProvider, MockEmailProvider, SMTPEmailProvider
+from app.services.email_provider import EmailProvider, MockEmailProvider
+from app.services.resend_provider import ResendEmailProvider
 from app.services.sms_service import SmsProvider, MockSmsProvider, EskizSmsProvider, TwilioSmsProvider
 from sqlalchemy.orm import Session
 
 
 def get_email_provider() -> EmailProvider:
-    if settings.smtp_host and settings.smtp_username:
-        return SMTPEmailProvider()
-    return MockEmailProvider()
+    match settings.email_provider:
+        case "resend":
+            return ResendEmailProvider()
+        case "mock":
+            return MockEmailProvider()
+    raise ValueError(f"Unknown EMAIL_PROVIDER: {settings.email_provider!r} (use 'mock' or 'resend')")
 
 
 def get_sms_provider() -> SmsProvider:

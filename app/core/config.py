@@ -15,13 +15,10 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 30
     company_name: str = "Clothes Shop"
 
-    # SMTP
-    smtp_host: str = ""
-    smtp_port: int = 587
-    smtp_username: str = ""
-    smtp_password: str = ""
-    smtp_from: str = ""
-    smtp_use_tls: bool = True
+    # Email delivery — "mock" (prints, no sending) or "resend"
+    email_provider: str = "mock"
+    resend_api_key: str = ""
+    email_from: str = ""
 
     # Eskiz SMS
     eskiz_email: str = ""

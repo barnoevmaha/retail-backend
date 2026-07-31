@@ -1,10 +1,5 @@
 from abc import ABC, abstractmethod
-import smtplib
 import re
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-from app.core.config import settings
 
 
 class EmailProvider(ABC):
@@ -44,31 +39,3 @@ class MockEmailProvider(EmailProvider):
     def send(self, recipient: str, subject: str, body: str) -> bool:
         print(f"[EMAIL MOCK] To: {recipient}, Subject: {subject}, Body: {body}")
         return True
-
-import traceback
-
-class SMTPEmailProvider(EmailProvider):
-    def send(self, recipient: str, subject: str, body: str) -> bool:
-        html = _wrap_html(body)
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"] = settings.smtp_from
-        msg["To"] = recipient
-        msg.attach(MIMEText(body, "plain"))
-        msg.attach(MIMEText(html, "html"))
-        try:
-            with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10) as server:
-                if settings.smtp_use_tls:
-                    server.starttls()
-                server.login(settings.smtp_username, settings.smtp_password)
-                server.sendmail(settings.smtp_from, [recipient], msg.as_string())
-            return True
-        except Exception as e:
-            print("========== SMTP ERROR ==========")
-            traceback.print_exc()
-            print("HOST:", settings.smtp_host)
-            print("PORT:", settings.smtp_port)
-            print("TLS:", settings.smtp_use_tls)
-            print("USER:", settings.smtp_username)
-            print("===============================")
-            return False
