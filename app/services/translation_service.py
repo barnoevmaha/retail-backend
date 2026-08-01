@@ -42,10 +42,43 @@ class TranslationService:
             still_missing = [k for k in missing if k not in db_rows]
             if still_missing:
                 entries = self._translate(still_missing)
-                repo.upsert_many(list(entries.values()))
-                self.cache.set_many(entries)
-                found.update(entries)
+                # keep only entries where at least one language got translated,
+                # so total failures stay missing and are retried on next sync
+                translated = {k: e for k, e in entries.items() if e["ru"] != k or e["uz"] != k}
+                if translated:
+                    repo.upsert_many(list(translated.values()))
+                    self.cache.set_many(translated)
+                    found.update(translated)
+
+        self._heal_stuck(db, found)
         return found
+
+    def _heal_stuck(self, db: Session, found: dict[str, dict]) -> None:
+        """Re-translate any language still equal to the key (outage leftovers).
+
+        ponytail: re-checks every synced entry, so a legit same-string
+        translation costs one provider call per fresh client visit.
+        """
+        repo = TranslationRepository(db)
+        for lang in ("ru", "uz"):
+            keys = [k for k, e in found.items() if e.get(lang) == k]
+            if not keys:
+                continue
+            for provider in self.providers:
+                try:
+                    translated = provider.translate(keys, lang)
+                except Exception as e:
+                    logger.warning("Translation provider %s failed for %s: %s", provider.name, lang, e)
+                    continue
+                updates = {}
+                for key, value in zip(keys, translated):
+                    if value and value != key:
+                        found[key][lang] = value
+                        updates[key] = found[key]
+                if updates:
+                    repo.upsert_many(list(updates.values()))
+                    self.cache.set_many(updates)
+                break
 
     def _translate(self, texts: list[str]) -> dict[str, dict]:
         """Ask configured providers for ru + uz, falling back to the next provider and finally English."""
