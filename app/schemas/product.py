@@ -1,20 +1,19 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from app.schemas.slug import SluggedBase
 from app.schemas.variant import VariantResponse
 
 
-class ProductCreate(BaseModel):
+class ProductCreate(SluggedBase):
     name: str
-    slug: str
     description: str | None = None
     brand_id: int | None = None
     category_id: int | None = None
 
 
-class ProductUpdate(BaseModel):
+class ProductUpdate(SluggedBase):
     name: str | None = None
-    slug: str | None = None
     description: str | None = None
     brand_id: int | None = None
     category_id: int | None = None

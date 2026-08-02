@@ -11,6 +11,7 @@ from app.repositories.color_repo import ColorRepository
 from app.repositories.size_repo import SizeRepository
 from app.models.user import User
 from app.utils.barcode import generate_barcode
+from app.utils.slug import unique_slug
 from app.services.audit_service import AuditService
 
 
@@ -44,9 +45,11 @@ class ProductService:
         return product, images
 
     def create_product(self, data, user: User):
-        if self.product_repo.get_by_slug(data.slug):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Slug already exists")
-        product = self.product_repo.create(**data.model_dump())
+        payload = data.model_dump()
+        payload["slug"] = unique_slug(
+            payload["slug"], lambda s: self.product_repo.get_by_slug(s) is not None
+        )
+        product = self.product_repo.create(**payload)
         self.audit.log("create", "product", product.id, user, new_values=data.model_dump())
         return product
 
@@ -56,6 +59,15 @@ class ProductService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
         old = {"name": product.name, "slug": product.slug, "description": product.description, "is_active": product.is_active}
         new = data.model_dump(exclude_unset=True)
+
+        def slug_free(s: str) -> bool:
+            existing = self.product_repo.get_by_slug(s)
+            return existing is None or existing.id == product.id
+
+        if new.get("slug") is None:
+            new.pop("slug", None)
+        if new.get("slug"):
+            new["slug"] = unique_slug(new["slug"], slug_free)
         updated = self.product_repo.update(product, **new)
         if user:
             self.audit.log("update", "product", product_id, user, old_values=old, new_values=new)

@@ -1,19 +1,19 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from app.schemas.slug import SluggedBase
 
-class CategoryCreate(BaseModel):
+
+class CategoryCreate(SluggedBase):
     name: str
-    slug: str
     description: str | None = None
     image: str | None = None
     sort_order: int = 0
     parent_id: int | None = None
 
 
-class CategoryUpdate(BaseModel):
+class CategoryUpdate(SluggedBase):
     name: str | None = None
-    slug: str | None = None
     description: str | None = None
     image: str | None = None
     sort_order: int | None = None

@@ -6,6 +6,7 @@ from app.core.dependencies import require_role
 from app.models.user import User
 from app.repositories.category_repo import CategoryRepository
 from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
+from app.utils.slug import unique_slug
 
 router = APIRouter(prefix="/api/categories", tags=["categories"])
 
@@ -30,9 +31,9 @@ def create_category(
     _: User = Depends(require_role("super_admin", "admin", "manager")),
 ):
     repo = CategoryRepository(db)
-    if repo.get_by_slug(body.slug):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Slug already exists")
-    return repo.create(**body.model_dump())
+    payload = body.model_dump()
+    payload["slug"] = unique_slug(payload["slug"], lambda s: repo.get_by_slug(s) is not None)
+    return repo.create(**payload)
 
 
 @router.put("/{category_id}", response_model=CategoryResponse)
@@ -46,7 +47,17 @@ def update_category(
     cat = repo.get_by_id(category_id)
     if not cat:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
-    return repo.update(cat, **body.model_dump(exclude_unset=True))
+
+    def slug_free(s: str) -> bool:
+        existing = repo.get_by_slug(s)
+        return existing is None or existing.id == cat.id
+
+    payload = body.model_dump(exclude_unset=True)
+    if payload.get("slug") is None:
+        payload.pop("slug", None)
+    if payload.get("slug"):
+        payload["slug"] = unique_slug(payload["slug"], slug_free)
+    return repo.update(cat, **payload)
 
 
 @router.delete("/{category_id}")

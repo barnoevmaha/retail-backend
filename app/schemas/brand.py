@@ -1,17 +1,17 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from app.schemas.slug import SluggedBase
 
-class BrandCreate(BaseModel):
+
+class BrandCreate(SluggedBase):
     name: str
-    slug: str
     description: str | None = None
     logo: str | None = None
 
 
-class BrandUpdate(BaseModel):
+class BrandUpdate(SluggedBase):
     name: str | None = None
-    slug: str | None = None
     description: str | None = None
     logo: str | None = None
     is_active: bool | None = None
