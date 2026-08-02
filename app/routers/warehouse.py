@@ -63,4 +63,4 @@ def list_movements(
     limit: int = Query(50, ge=1, le=200),
     db: Session = Depends(get_db),
 ):
-    return StockService(db).get_movements(variant_id, skip, limit)
+    return StockService(db).get_movements(variant_id=variant_id, skip=skip, limit=limit)
