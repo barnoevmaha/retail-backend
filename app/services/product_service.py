@@ -29,8 +29,8 @@ class ProductService:
         self.audit = AuditService(db)
 
     def search_products(self, q: str = "", category_id: int | None = None, brand_id: int | None = None, skip: int = 0, limit: int = 20):
-        products = self.product_repo.search(q, category_id, brand_id, skip, limit)
-        total = self.product_repo.count(q, category_id, brand_id)
+        products = self.product_repo.search(q=q, category_id=category_id, brand_id=brand_id, skip=skip, limit=limit)
+        total = self.product_repo.count(q=q, category_id=category_id, brand_id=brand_id)
         return products, total
 
     def get_product(self, slug: str):

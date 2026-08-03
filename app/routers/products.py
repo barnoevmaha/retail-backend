@@ -5,7 +5,9 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_role
 from app.models.user import User
 from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
+from app.schemas.product_image import ProductImageResponse
 from app.services.product_service import ProductService
+from app.repositories.product_image_repo import ProductImageRepository
 
 router = APIRouter(prefix="/api/products", tags=["products"])
 
@@ -24,12 +26,14 @@ def list_products(
     service = ProductService(db)
     products, total = service.search_products(q, category_id, brand_id, skip, limit)
     items = []
+    images_repo = ProductImageRepository(db)
     for p in products:
         d = ProductResponse.model_validate(p).model_dump()
         cat = db.query(Category).filter(Category.id == p.category_id).first()
         brd = db.query(Brand).filter(Brand.id == p.brand_id).first()
         d["category_name"] = cat.name if cat else None
         d["brand_name"] = brd.name if brd else None
+        d["images"] = [ProductImageResponse.model_validate(i) for i in images_repo.list_by_product(p.id)]
         items.append(d)
     return {"items": items, "total": total}
 
@@ -37,7 +41,10 @@ def list_products(
 @router.get("/{slug}", response_model=ProductResponse)
 def get_product(slug: str, db: Session = Depends(get_db)):
     service = ProductService(db)
-    return service.get_product(slug)
+    p = service.get_product(slug)
+    d = ProductResponse.model_validate(p).model_dump()
+    d["images"] = [ProductImageResponse.model_validate(i) for i in ProductImageRepository(db).list_by_product(p.id)]
+    return d
 
 
 @router.post("/", response_model=ProductResponse)
