@@ -28,9 +28,9 @@ class ProductService:
         self.size_repo = SizeRepository(db)
         self.audit = AuditService(db)
 
-    def search_products(self, q: str = "", category_id: int | None = None, brand_id: int | None = None, skip: int = 0, limit: int = 20):
-        products = self.product_repo.search(q=q, category_id=category_id, brand_id=brand_id, skip=skip, limit=limit)
-        total = self.product_repo.count(q=q, category_id=category_id, brand_id=brand_id)
+    def search_products(self, q: str = "", category_id: int | None = None, brand_id: int | None = None, is_active: bool | None = None, skip: int = 0, limit: int = 20):
+        products = self.product_repo.search(q=q, category_id=category_id, brand_id=brand_id, is_active=is_active, skip=skip, limit=limit)
+        total = self.product_repo.count(q=q, category_id=category_id, brand_id=brand_id, is_active=is_active)
         return products, total
 
     def get_product(self, slug: str):

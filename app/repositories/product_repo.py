@@ -18,8 +18,11 @@ class ProductRepository:
     def search(self, q: str = "", category_id: int | None = None, brand_id: int | None = None,
                color_id: int | None = None, size_id: int | None = None,
                barcode: str = "", sku: str = "",
+               is_active: bool | None = True,
                skip: int = 0, limit: int = 20) -> list[Product]:
-        query = self.db.query(Product).filter(Product.is_active == True)
+        query = self.db.query(Product)
+        if is_active is not None:
+            query = query.filter(Product.is_active == is_active)
         if q:
             query = query.filter(
                 or_(
@@ -44,8 +47,11 @@ class ProductRepository:
 
     def count(self, q: str = "", category_id: int | None = None, brand_id: int | None = None,
               color_id: int | None = None, size_id: int | None = None,
-              barcode: str = "", sku: str = "") -> int:
-        query = self.db.query(Product).filter(Product.is_active == True)
+              barcode: str = "", sku: str = "",
+              is_active: bool | None = True) -> int:
+        query = self.db.query(Product)
+        if is_active is not None:
+            query = query.filter(Product.is_active == is_active)
         if q:
             query = query.filter(
                 or_(

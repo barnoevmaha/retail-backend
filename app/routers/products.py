@@ -17,6 +17,7 @@ def list_products(
     q: str = "",
     category_id: int | None = Query(None),
     brand_id: int | None = Query(None),
+    is_active: bool | None = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
@@ -24,7 +25,7 @@ def list_products(
     from app.models.category import Category
     from app.models.brand import Brand
     service = ProductService(db)
-    products, total = service.search_products(q, category_id, brand_id, skip, limit)
+    products, total = service.search_products(q, category_id, brand_id, is_active, skip, limit)
     items = []
     images_repo = ProductImageRepository(db)
     for p in products:

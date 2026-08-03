@@ -14,4 +14,4 @@ class ProductImage(Base):
     is_main = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    product = relationship("Product", backref="images")
+    product = relationship("Product", back_populates="images")
