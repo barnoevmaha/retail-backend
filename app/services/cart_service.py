@@ -62,9 +62,11 @@ class CartService:
             variant = self.variant_repo.get_by_id(item.variant_id)
             price = float(variant.selling_price) if variant else 0
             name = ""
+            image_url = ""
             if variant:
                 product = self.db.query(Product).filter(Product.id == variant.product_id).first()
                 name = product.name if product else ""
+                image_url = product.images[0].image_url if product and product.images else ""
             result_items.append({
                 "id": item.id,
                 "variant_id": item.variant_id,
@@ -72,6 +74,7 @@ class CartService:
                 "price": price,
                 "product_name": name,
                 "name": name,
+                "image_url": image_url,
                 "size": variant.size if variant else None,
                 "color": variant.color if variant else None,
                 "barcode": variant.barcode if variant else "",
