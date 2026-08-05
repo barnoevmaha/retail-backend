@@ -17,6 +17,8 @@ router = APIRouter(prefix="/api/checkout", tags=["checkout"])
 class CheckoutRequest(BaseModel):
     payment_method: str = "card"
     promo_code: str | None = None
+    session_key: str | None = None
+    customer_id: int | None = None
 
 
 @router.post("/", response_model=OrderResponse)
@@ -25,16 +27,24 @@ def checkout(
     db: Session = Depends(get_db),
     user: User | None = Depends(optional_current_user),
     x_session_key: str = Header(default=""),
-    x_customer_id: int | None = Header(default=None),
+    x_customer_id: str | None = Header(default=None),
 ):
-    customer_id = x_customer_id
+    customer_id = body.customer_id
+    if not customer_id and x_customer_id is not None:
+        try:
+            customer_id = int(x_customer_id)
+        except ValueError:
+            customer_id = None
     if not customer_id and user:
         customer = CustomerRepository(db).get_by_user_id(user.id)
         if customer:
             customer_id = customer.id
 
     cart_svc = CartService(db)
-    cart = cart_svc.get_or_create_cart(customer_id=customer_id, session_key=x_session_key or None)
+    cart = cart_svc.get_or_create_cart(
+        customer_id=customer_id,
+        session_key=body.session_key or x_session_key or None,
+    )
 
     order_svc = OrderService(db)
     order = order_svc.create_from_cart(
