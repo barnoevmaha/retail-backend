@@ -23,6 +23,8 @@ class AuthService:
         return create_access_token({"sub": str(user.id), "role": user.role})
 
     def register(self, email: str, password: str, role: str = "customer") -> str:
+        # role is never trusted from the client — self-registration is always a customer
+        role = "customer"
         if self.repo.get_by_email(email):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
         user = self.repo.create(email, hash_password(password), role)

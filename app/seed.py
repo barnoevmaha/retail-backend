@@ -186,7 +186,7 @@ def seed():
     else:
         print("  Customers already exist...")
 
-    if db.query(AuditLog).count() == 0:
+    if db.query(AuditLog).count() == 0 and admin:
         for action, entity in [("login", "user"), ("create", "product"), ("update", "variant"),
                                ("inventory_change", "variant"), ("create", "order")]:
             db.add(AuditLog(user_id=admin.id, user_email=admin.email,
@@ -195,7 +195,7 @@ def seed():
     else:
         print("  Audit logs already exist...")
 
-    if db.query(StockMovement).count() == 0 and all_variants:
+    if db.query(StockMovement).count() == 0 and all_variants and admin:
         for v in all_variants[:5]:
             db.add(StockMovement(variant_id=v.id, user_id=admin.id,
                                  operation="receiving", quantity=random.randint(20, 100),

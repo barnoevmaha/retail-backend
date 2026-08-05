@@ -20,5 +20,6 @@ class TokenResponse(BaseModel):
 class MeResponse(BaseModel):
     id: int
     email: str
+    name: str | None = None
     role: str
     is_active: bool

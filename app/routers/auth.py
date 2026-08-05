@@ -27,4 +27,4 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=MeResponse)
 def me(user: User = Depends(get_current_user)):
-    return MeResponse(id=user.id, email=user.email, role=user.role, is_active=user.is_active)
+    return MeResponse(id=user.id, email=user.email, name=user.name, role=user.role, is_active=user.is_active)
