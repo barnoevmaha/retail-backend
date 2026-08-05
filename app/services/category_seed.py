@@ -11,6 +11,12 @@ CATEGORIES = [
     {"slug": "accessories", "name": "Accessories", "sort": 50},
     {"slug": "bags", "name": "Bags", "sort": 60},
     {"slug": "shoes", "name": "Shoes", "sort": 70},
+    {"slug": "sweatshirts-hoodies", "name": "Sweatshirts & Hoodies", "sort": 80},
+    {"slug": "hats-caps", "name": "Hats & Caps", "sort": 90},
+    {"slug": "belts", "name": "Belts", "sort": 100},
+    {"slug": "socks", "name": "Socks", "sort": 110},
+    {"slug": "coats", "name": "Coats", "sort": 120},
+    {"slug": "dresses-skirts", "name": "Dresses & Skirts", "sort": 130},
 ]
 
 
