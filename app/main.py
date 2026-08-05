@@ -15,12 +15,18 @@ async def lifespan(app: FastAPI):
     from app.services.bootstrap_service import ensure_super_admin
     from app.services.translation_seed import ensure_translations_seeded
     from app.services.category_seed import ensure_categories_seeded
+    import logging
+    log = logging.getLogger("startup")
     db = SessionLocal()
     try:
-        ensure_super_admin(db)
-        ensure_categories_seeded(db)
-        ensure_translations_seeded(db)
-        db.commit()
+        try:
+            ensure_super_admin(db)
+            ensure_categories_seeded(db)
+            ensure_translations_seeded(db)
+            db.commit()
+        except Exception:
+            log.exception("startup seeding failed")
+            db.rollback()
     finally:
         db.close()
     yield
