@@ -33,6 +33,7 @@ def list_products(
         cat = db.query(Category).filter(Category.id == p.category_id).first()
         brd = db.query(Brand).filter(Brand.id == p.brand_id).first()
         d["category_name"] = cat.name if cat else None
+        d["category_slug"] = cat.slug if cat else None
         d["brand_name"] = brd.name if brd else None
         d["images"] = [ProductImageResponse.model_validate(i) for i in images_repo.list_by_product(p.id)]
         d["variants"] = [v for v in d["variants"] if v.get("is_active", True)]
@@ -47,6 +48,9 @@ def get_product(slug: str, db: Session = Depends(get_db)):
     d = ProductResponse.model_validate(p).model_dump()
     d["images"] = [ProductImageResponse.model_validate(i) for i in ProductImageRepository(db).list_by_product(p.id)]
     d["variants"] = [v for v in d["variants"] if v.get("is_active", True)]
+    if p.category:
+        d["category_name"] = p.category.name
+        d["category_slug"] = p.category.slug
     return d
 
 

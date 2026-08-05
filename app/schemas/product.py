@@ -29,6 +29,7 @@ class ProductResponse(BaseModel):
     brand_id: int | None
     category_id: int | None
     category_name: str | None = None
+    category_slug: str | None = None
     brand_name: str | None = None
     variants: list[VariantResponse] = []
     images: list[ProductImageResponse] = []
