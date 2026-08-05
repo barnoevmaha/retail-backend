@@ -4,11 +4,13 @@ from sqlalchemy.orm import Session
 from app.models.category import Category
 
 CATEGORIES = [
+    {"slug": "shirts", "name": "Shirts, Polos & T-Shirts", "sort": 10},
     {"slug": "knitwear", "name": "Knitwear", "sort": 20},
     {"slug": "jackets-blazers-vests", "name": "Jackets, Blazers & Vests", "sort": 30},
     {"slug": "wallets", "name": "Wallets", "sort": 40},
-    {"slug": "bags", "name": "Bags", "sort": 50},
-    {"slug": "shoes", "name": "Shoes", "sort": 60},
+    {"slug": "accessories", "name": "Accessories", "sort": 50},
+    {"slug": "bags", "name": "Bags", "sort": 60},
+    {"slug": "shoes", "name": "Shoes", "sort": 70},
 ]
 
 
