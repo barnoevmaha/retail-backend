@@ -6,3 +6,4 @@ venv/
 .venv/
 *.db
 .DS_Store
+uploads/
