@@ -48,15 +48,15 @@ def update_category(
     if not cat:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
 
-    def slug_free(s: str) -> bool:
+    def slug_taken(s: str) -> bool:
         existing = repo.get_by_slug(s)
-        return existing is None or existing.id == cat.id
+        return existing is not None and existing.id != cat.id
 
     payload = body.model_dump(exclude_unset=True)
     if payload.get("slug") is None:
         payload.pop("slug", None)
     if payload.get("slug"):
-        payload["slug"] = unique_slug(payload["slug"], slug_free)
+        payload["slug"] = unique_slug(payload["slug"], slug_taken)
     return repo.update(cat, **payload)
 
 
