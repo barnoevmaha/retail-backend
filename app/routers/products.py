@@ -35,6 +35,7 @@ def list_products(
         d["category_name"] = cat.name if cat else None
         d["brand_name"] = brd.name if brd else None
         d["images"] = [ProductImageResponse.model_validate(i) for i in images_repo.list_by_product(p.id)]
+        d["variants"] = [v for v in d["variants"] if v.get("is_active", True)]
         items.append(d)
     return {"items": items, "total": total}
 
@@ -45,6 +46,7 @@ def get_product(slug: str, db: Session = Depends(get_db)):
     p = service.get_product(slug)
     d = ProductResponse.model_validate(p).model_dump()
     d["images"] = [ProductImageResponse.model_validate(i) for i in ProductImageRepository(db).list_by_product(p.id)]
+    d["variants"] = [v for v in d["variants"] if v.get("is_active", True)]
     return d
 
 

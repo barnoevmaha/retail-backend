@@ -56,6 +56,17 @@ def get_variant(variant_id: int, db: Session = Depends(get_db)):
     return _enrich(variant)
 
 
+@router.delete("/{variant_id}")
+def delete_variant(
+    variant_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_role("super_admin", "admin", "manager")),
+):
+    service = ProductService(db)
+    service.deactivate_variant(variant_id, user)
+    return {"ok": True}
+
+
 @router.post("/")
 def create_variant(
     body: VariantCreate,

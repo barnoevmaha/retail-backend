@@ -83,9 +83,17 @@ class ProductService:
 
     def get_variant_by_barcode(self, barcode: str):
         variant = self.variant_repo.get_by_barcode(barcode)
-        if not variant:
+        if not variant or not variant.is_active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Variant not found")
         return variant
+
+    def deactivate_variant(self, variant_id: int, user: User | None = None):
+        variant = self.variant_repo.get_by_id(variant_id)
+        if not variant:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Variant not found")
+        variant.is_active = False
+        self.db.commit()
+        self.audit.log("deactivate", "variant", variant_id, user, new_values={"is_active": False})
 
     def create_variant(self, data, user: User | None = None):
         barcode = data.barcode or generate_barcode()
