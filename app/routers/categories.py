@@ -11,6 +11,12 @@ from app.utils.slug import unique_slug
 router = APIRouter(prefix="/api/categories", tags=["categories"])
 
 
+@router.get("/size-systems")
+def list_size_systems(db: Session = Depends(get_db)):
+    from app.services.size_systems import SIZE_SYSTEMS
+    return [{"key": k, "sizes": sizes} for k, sizes in SIZE_SYSTEMS.items()]
+
+
 @router.get("/", response_model=list[CategoryResponse])
 def list_categories(db: Session = Depends(get_db)):
     return CategoryRepository(db).list_all()
@@ -33,6 +39,9 @@ def create_category(
     repo = CategoryRepository(db)
     payload = body.model_dump()
     payload["slug"] = unique_slug(payload["slug"], lambda s: repo.get_by_slug(s) is not None)
+    if not payload.get("size_system"):
+        from app.services.size_systems import system_for_category
+        payload["size_system"] = system_for_category(payload["name"], payload["slug"])
     return repo.create(**payload)
 
 
@@ -57,6 +66,9 @@ def update_category(
         payload.pop("slug", None)
     if payload.get("slug"):
         payload["slug"] = unique_slug(payload["slug"], slug_taken)
+    if "size_system" in payload and not payload.get("size_system"):
+        from app.services.size_systems import system_for_category
+        payload["size_system"] = system_for_category(cat.name, cat.slug)
     return repo.update(cat, **payload)
 
 

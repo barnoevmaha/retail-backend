@@ -10,6 +10,7 @@ class CategoryCreate(SluggedBase):
     image: str | None = None
     sort_order: int = 0
     parent_id: int | None = None
+    size_system: str | None = None
 
 
 class CategoryUpdate(SluggedBase):
@@ -19,6 +20,7 @@ class CategoryUpdate(SluggedBase):
     sort_order: int | None = None
     parent_id: int | None = None
     is_active: bool | None = None
+    size_system: str | None = None
 
 
 class CategoryResponse(BaseModel):
@@ -30,6 +32,7 @@ class CategoryResponse(BaseModel):
     is_active: bool
     sort_order: int
     parent_id: int | None
+    size_system: str | None = None
 
     class Config:
         from_attributes = True
