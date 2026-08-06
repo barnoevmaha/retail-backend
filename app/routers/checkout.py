@@ -53,6 +53,7 @@ def checkout(
         payment_method=body.payment_method,
         user=user,
     )
+    response = order_svc.build_response(order)
 
     if body.promo_code:
         try:
@@ -62,4 +63,4 @@ def checkout(
         except Exception:
             pass
 
-    return OrderResponse.model_validate(order)
+    return OrderResponse.model_validate(response)

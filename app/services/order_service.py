@@ -76,6 +76,37 @@ class OrderService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
         return order
 
+    def build_response(self, order: "Order"):
+        from app.models.product import Product
+        items = []
+        for it in order.items:
+            variant = it.variant
+            product = self.db.query(Product).filter(Product.id == variant.product_id).first() if variant else None
+            items.append({
+                "id": it.id,
+                "variant_id": it.variant_id,
+                "quantity": it.quantity,
+                "price": float(it.price),
+                "product_name": product.name if product else "",
+                "product_slug": product.slug if product else "",
+                "image_url": product.images[0].image_url if product and product.images else "",
+                "size": variant.size if variant else None,
+                "color": variant.color if variant else None,
+                "color_hex": variant.color_rel.hex_value if variant and variant.color_rel else None,
+            })
+        return {
+            "id": order.id,
+            "customer_id": order.customer_id,
+            "status": order.status,
+            "total_amount": float(order.total_amount),
+            "payment_method": order.payment_method,
+            "payment_status": order.payment_status,
+            "notes": order.notes,
+            "created_at": order.created_at,
+            "updated_at": order.updated_at,
+            "items": items,
+        }
+
     def update_status(self, order_id: int, status: str, user: User | None = None):
         order = self.order_repo.get_by_id(order_id)
         if not order:

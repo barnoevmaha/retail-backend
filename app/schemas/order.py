@@ -7,6 +7,12 @@ class OrderItemResponse(BaseModel):
     variant_id: int
     quantity: int
     price: float
+    product_name: str = ""
+    product_slug: str = ""
+    image_url: str = ""
+    size: str | None = None
+    color: str | None = None
+    color_hex: str | None = None
 
     class Config:
         from_attributes = True

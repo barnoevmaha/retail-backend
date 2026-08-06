@@ -16,13 +16,29 @@ class CartService:
 
     def get_or_create_cart(self, customer_id: int | None = None, session_key: str | None = None):
         cart = None
-        if customer_id:
-            cart = self.cart_repo.get_by_customer(customer_id)
-        if not cart and session_key:
+        if session_key:
             cart = self.cart_repo.get_by_session(session_key)
-        if not cart:
-            cart = self.cart_repo.create_cart(customer_id=customer_id, session_key=session_key)
-        return cart
+        if cart:
+            if customer_id and cart.customer_id != customer_id:
+                theirs = self.cart_repo.get_by_customer(customer_id)
+                if theirs and theirs.id != cart.id:
+                    for item in theirs.items:
+                        existing = self.cart_repo.get_item(cart.id, item.variant_id)
+                        if existing:
+                            self.cart_repo.update_item(existing, existing.quantity + item.quantity)
+                        else:
+                            self.cart_repo.add_item(cart.id, item.variant_id, item.quantity)
+                    self.cart_repo.clear_cart(theirs.id)
+                    self.db.commit()
+                cart.customer_id = customer_id
+                self.db.commit()
+            return cart
+        if customer_id:
+            existing = self.cart_repo.get_by_customer(customer_id)
+            if existing:
+                return existing
+            return self.cart_repo.create_cart(customer_id=customer_id)
+        return self.cart_repo.create_cart(customer_id=None, session_key=session_key)
 
     def add_item(self, cart_id: int, variant_id: int, quantity: int = 1):
         variant = self.variant_repo.get_by_id(variant_id)
