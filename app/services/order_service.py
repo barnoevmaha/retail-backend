@@ -22,7 +22,7 @@ class OrderService:
         self.audit = AuditService(db)
         self.receipt_service = ReceiptService(db)
 
-    def create_from_cart(self, cart_id: int, customer_id: int | None, payment_method: str | None, user: User | None = None):
+    def create_from_cart(self, cart_id: int, customer_id: int | None, payment_method: str | None, user: User | None = None, **delivery):
         from app.models.cart import CartItem
         from app.models.product import Product
 
@@ -30,21 +30,32 @@ class OrderService:
         if not items:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cart is empty")
 
-        total = 0
+        subtotal = 0
         for item in items:
             variant = self.variant_repo.get_by_id(item.variant_id)
             if not variant:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Variant {item.variant_id} not found")
             if variant.quantity < item.quantity:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Insufficient stock for variant {variant.id}")
-            total += float(variant.selling_price) * item.quantity
+            subtotal += float(variant.selling_price) * item.quantity
+
+        # ponytail: flat fee, free above $500 — move to settings when pricing changes
+        delivery_fee = 0.0 if subtotal >= 500 else 10.0
+        total = round(subtotal + delivery_fee, 2)
 
         order = self.order_repo.create(
             customer_id=customer_id,
             user_id=user.id if user else None,
-            total_amount=round(total, 2),
+            total_amount=total,
             payment_method=payment_method,
             status="pending",
+            customer_name=delivery.get("full_name"),
+            customer_phone=delivery.get("phone"),
+            city=delivery.get("city"),
+            address=delivery.get("address"),
+            apartment=delivery.get("apartment"),
+            delivery_note=delivery.get("delivery_note"),
+            delivery_fee=delivery_fee,
         )
 
         for item in items:
@@ -61,7 +72,7 @@ class OrderService:
                                           total_spent=float(customer.total_spent) + total)
 
         self.audit.log("create", "order", order.id, user,
-                       new_values={"total": round(total, 2), "payment_method": payment_method, "items": len(items)})
+                       new_values={"total": total, "payment_method": payment_method, "items": len(items)})
 
         try:
             self.receipt_service.create_from_order(order)
@@ -78,10 +89,13 @@ class OrderService:
 
     def build_response(self, order: "Order"):
         from app.models.product import Product
+        from app.models.customer import Customer
         items = []
+        subtotal = 0.0
         for it in order.items:
             variant = it.variant
             product = self.db.query(Product).filter(Product.id == variant.product_id).first() if variant else None
+            subtotal += float(it.price) * it.quantity
             items.append({
                 "id": it.id,
                 "variant_id": it.variant_id,
@@ -93,7 +107,20 @@ class OrderService:
                 "size": variant.size if variant else None,
                 "color": variant.color if variant else None,
                 "color_hex": variant.color_rel.hex_value if variant and variant.color_rel else None,
+                "barcode": variant.barcode if variant else "",
             })
+        customer = self.db.query(Customer).filter(Customer.id == order.customer_id).first() if order.customer_id else None
+        customer_name = order.customer_name or (f"{customer.first_name} {customer.last_name}".strip() if customer else None)
+        addr = order.address or ""
+        if order.apartment:
+            addr += f", apt. {order.apartment}"
+        delivery = [l for l in [
+            customer_name,
+            order.city,
+            addr or None,
+            order.customer_phone,
+        ] if l]
+        delivery_fee = float(order.delivery_fee or 0)
         return {
             "id": order.id,
             "customer_id": order.customer_id,
@@ -102,9 +129,28 @@ class OrderService:
             "payment_method": order.payment_method,
             "payment_status": order.payment_status,
             "notes": order.notes,
+            "customer_name": customer_name,
+            "customer_phone": order.customer_phone or (customer.phone if customer else None),
+            "customer_email": customer.email if customer else None,
+            "city": order.city,
+            "address": order.address,
+            "apartment": order.apartment,
+            "delivery_note": order.delivery_note,
+            "delivery_fee": delivery_fee,
+            "subtotal": round(subtotal, 2),
+            "shipping": delivery_fee,
+            "items_count": len(items),
+            "delivery": delivery,
+            "items": items,
             "created_at": order.created_at,
             "updated_at": order.updated_at,
-            "items": items,
+            "customer": {
+                "first_name": customer.first_name if customer else "",
+                "last_name": customer.last_name if customer else "",
+                "email": customer.email if customer else "",
+                "phone": order.customer_phone or (customer.phone if customer else ""),
+                "address": ", ".join([f for f in (order.city, order.address, order.apartment and f"apt. {order.apartment}") if f]),
+            } if customer else None,
         }
 
     def update_status(self, order_id: int, status: str, user: User | None = None):

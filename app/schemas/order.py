@@ -26,6 +26,17 @@ class OrderResponse(BaseModel):
     payment_method: str | None
     payment_status: str | None
     notes: str | None
+    customer_name: str | None = None
+    customer_phone: str | None = None
+    city: str | None = None
+    address: str | None = None
+    apartment: str | None = None
+    delivery_note: str | None = None
+    delivery_fee: float = 0
+    subtotal: float = 0
+    shipping: float = 0
+    items_count: int = 0
+    delivery: list[str] = []
     created_at: datetime
     updated_at: datetime
     items: list[OrderItemResponse] = []

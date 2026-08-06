@@ -19,6 +19,12 @@ class CheckoutRequest(BaseModel):
     promo_code: str | None = None
     session_key: str | None = None
     customer_id: int | None = None
+    full_name: str
+    phone: str
+    city: str
+    address: str
+    apartment: str | None = None
+    delivery_note: str | None = None
 
 
 @router.post("/", response_model=OrderResponse)
@@ -52,6 +58,12 @@ def checkout(
         customer_id=customer_id,
         payment_method=body.payment_method,
         user=user,
+        full_name=body.full_name,
+        phone=body.phone,
+        city=body.city,
+        address=body.address,
+        apartment=body.apartment,
+        delivery_note=body.delivery_note,
     )
     response = order_svc.build_response(order)
 

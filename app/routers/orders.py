@@ -33,14 +33,14 @@ def list_orders(
     else:
         orders = service.list_orders(status=status, skip=skip, limit=limit)
     return {
-        "items": [OrderResponse.model_validate(o) for o in orders],
+        "items": [OrderService(db).build_response(o) for o in orders],
         "total": len(orders),
     }
 
 
-@router.get("/{order_id}", response_model=OrderResponse)
+@router.get("/{order_id}")
 def get_order(order_id: int, db: Session = Depends(get_db)):
-    return OrderService(db).get_order(order_id)
+    return OrderService(db).build_response(OrderService(db).get_order(order_id))
 
 
 @router.put("/{order_id}/status", response_model=OrderResponse)

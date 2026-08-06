@@ -15,6 +15,13 @@ class Order(Base):
     payment_method = Column(String(50))
     payment_status = Column(String(50), default="pending")
     notes = Column(String(500))
+    customer_name = Column(String(255))
+    customer_phone = Column(String(50))
+    city = Column(String(100))
+    address = Column(String(500))
+    apartment = Column(String(50))
+    delivery_note = Column(String(1000))
+    delivery_fee = Column(Numeric(12, 2), default=0, server_default="0")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
