@@ -9,6 +9,7 @@ class ProductImage(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    color_id = Column(Integer, ForeignKey("colors.id"), nullable=True)
     image_url = Column(String(500), nullable=False)
     sort_order = Column(Integer, default=0)
     is_main = Column(Boolean, default=False)

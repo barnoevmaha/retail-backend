@@ -10,8 +10,8 @@ class ProductImageRepository:
     def list_by_product(self, product_id: int) -> list[ProductImage]:
         return self.db.query(ProductImage).filter(ProductImage.product_id == product_id).order_by(ProductImage.sort_order).all()
 
-    def create(self, product_id: int, image_url: str, sort_order: int = 0, is_main: bool = False) -> ProductImage:
-        img = ProductImage(product_id=product_id, image_url=image_url, sort_order=sort_order, is_main=is_main)
+    def create(self, product_id: int, image_url: str, sort_order: int = 0, is_main: bool = False, color_id: int | None = None) -> ProductImage:
+        img = ProductImage(product_id=product_id, image_url=image_url, sort_order=sort_order, is_main=is_main, color_id=color_id)
         self.db.add(img)
         self.db.commit()
         self.db.refresh(img)

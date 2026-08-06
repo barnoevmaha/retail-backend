@@ -31,7 +31,7 @@ def add_image(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("super_admin", "admin", "manager")),
 ):
-    return ProductImageRepository(db).create(product_id, body.image_url, body.sort_order, body.is_main)
+    return ProductImageRepository(db).create(product_id, body.image_url, body.sort_order, body.is_main, body.color_id)
 
 
 @router.post("/upload", response_model=ProductImageResponse)
@@ -40,6 +40,7 @@ def upload_image(
     file: UploadFile = File(...),
     sort_order: int = Form(0),
     is_main: bool = Form(False),
+    color_id: int | None = Form(None),
     db: Session = Depends(get_db),
     _: User = Depends(require_role("super_admin", "admin", "manager")),
 ):
@@ -49,7 +50,7 @@ def upload_image(
     content = file.file.read()
     filepath.write_bytes(content)
     image_url = f"/uploads/{filename}"
-    return ProductImageRepository(db).create(product_id, image_url, sort_order, is_main)
+    return ProductImageRepository(db).create(product_id, image_url, sort_order, is_main, color_id)
 
 
 @router.get("/file/{filename}")
