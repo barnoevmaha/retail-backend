@@ -12,6 +12,15 @@ from app.repositories.product_image_repo import ProductImageRepository
 router = APIRouter(prefix="/api/products", tags=["products"])
 
 
+def _with_color_info(d: dict, p) -> dict:
+    hex_by_id = {v.id: v.color_rel.hex_value if v.color_rel else None for v in p.variants}
+    name_by_id = {v.id: v.color_rel.name if v.color_rel else None for v in p.variants}
+    for vd in d["variants"]:
+        vd["color_hex"] = hex_by_id.get(vd["id"])
+        vd["color_name"] = vd.get("color_name") or name_by_id.get(vd["id"])
+    return d
+
+
 @router.get("/")
 def list_products(
     q: str = "",
@@ -37,6 +46,7 @@ def list_products(
         d["brand_name"] = brd.name if brd else None
         d["images"] = [ProductImageResponse.model_validate(i) for i in images_repo.list_by_product(p.id)]
         d["variants"] = [v for v in d["variants"] if v.get("is_active", True)]
+        _with_color_info(d, p)
         items.append(d)
     return {"items": items, "total": total}
 
@@ -48,6 +58,7 @@ def get_product(slug: str, db: Session = Depends(get_db)):
     d = ProductResponse.model_validate(p).model_dump()
     d["images"] = [ProductImageResponse.model_validate(i) for i in ProductImageRepository(db).list_by_product(p.id)]
     d["variants"] = [v for v in d["variants"] if v.get("is_active", True)]
+    _with_color_info(d, p)
     if p.category:
         d["category_name"] = p.category.name
         d["category_slug"] = p.category.slug

@@ -42,6 +42,7 @@ class VariantResponse(BaseModel):
     created_at: datetime
     color_name: str | None = None
     size_name: str | None = None
+    color_hex: str | None = None
 
     class Config:
         from_attributes = True
