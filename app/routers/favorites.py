@@ -3,10 +3,9 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.dependencies import get_current_user
-from app.models.user import User
+from app.core.dependencies import get_current_customer
+from app.models.customer import Customer
 from app.repositories.favorite_repo import FavoriteRepository
-from app.repositories.customer_repo import CustomerRepository
 from app.models.product import Product
 from app.schemas.favorite import FavoriteResponse
 
@@ -35,11 +34,8 @@ def _with_product(db, favs):
 @router.get("/", response_model=list[FavoriteResponse])
 def list_favorites(
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
+    customer: Customer = Depends(get_current_customer),
 ):
-    customer = CustomerRepository(db).get_by_user_id(user.id)
-    if not customer:
-        return []
     return _with_product(db, FavoriteRepository(db).list_by_customer(customer.id))
 
 
@@ -47,11 +43,8 @@ def list_favorites(
 def add_favorite(
     body: FavoriteAdd,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
+    customer: Customer = Depends(get_current_customer),
 ):
-    customer = CustomerRepository(db).get_by_user_id(user.id)
-    if not customer:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Customer profile required")
     repo = FavoriteRepository(db)
     existing = repo.get(customer.id, body.product_id)
     if existing:
@@ -63,11 +56,8 @@ def add_favorite(
 def remove_favorite(
     product_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
+    customer: Customer = Depends(get_current_customer),
 ):
-    customer = CustomerRepository(db).get_by_user_id(user.id)
-    if not customer:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Customer profile required")
     repo = FavoriteRepository(db)
     fav = repo.get(customer.id, product_id)
     if not fav:
