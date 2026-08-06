@@ -6,6 +6,7 @@ from app.core.dependencies import get_current_user, require_role
 from app.models.user import User
 from app.repositories.customer_repo import CustomerRepository
 from app.schemas.customer import CustomerCreate, CustomerUpdate, CustomerResponse
+from app.services.order_service import OrderService
 
 router = APIRouter(prefix="/api/customers", tags=["customers"])
 
@@ -31,6 +32,28 @@ def get_my_profile(
         from fastapi import HTTPException, status
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer profile not found")
     return customer
+
+
+@router.get("/{customer_id}/detail")
+def get_customer_detail(
+    customer_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("super_admin", "admin", "manager", "cashier")),
+):
+    from fastapi import HTTPException, status
+    from app.models.customer import Address as AddressModel
+
+    repo = CustomerRepository(db)
+    customer = repo.get_by_id(customer_id)
+    if not customer:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
+
+    orders = OrderService(db).list_orders(customer_id=customer_id, limit=20)
+    return {
+        "customer": customer,
+        "addresses": db.query(AddressModel).filter(AddressModel.customer_id == customer_id).order_by(AddressModel.created_at.desc()).all(),
+        "recent_orders": [OrderService(db).build_response(o) for o in orders],
+    }
 
 
 @router.get("/{customer_id}", response_model=CustomerResponse)
