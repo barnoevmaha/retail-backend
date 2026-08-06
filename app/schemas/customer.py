@@ -82,8 +82,13 @@ class CustomerLoginRequest(BaseModel):
 
 class CustomerTokenResponse(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
     customer: CustomerResponse
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
 
 
 # --- Verification ---

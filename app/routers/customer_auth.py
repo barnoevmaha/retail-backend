@@ -8,6 +8,7 @@ from app.schemas.customer import (
     RegisterEmailRequest, RegisterEmailVerifyRequest,
     RegisterPhoneRequest, RegisterPhoneVerifyRequest,
     CustomerLoginRequest, CustomerTokenResponse, CustomerResponse,
+    RefreshTokenRequest,
     ForgotPasswordRequest, ResetPasswordRequest,
     SendCodeRequest, LinkEmailRequest, LinkEmailVerifyRequest,
     LinkPhoneRequest, LinkPhoneVerifyRequest,
@@ -44,6 +45,11 @@ def register_phone_verify(body: RegisterPhoneVerifyRequest, db: Session = Depend
 @router.post("/login")
 def customer_login(body: CustomerLoginRequest, db: Session = Depends(get_db)):
     return CustomerAuthService(db).login(body.login, body.password)
+
+
+@router.post("/refresh")
+def customer_refresh(body: RefreshTokenRequest, db: Session = Depends(get_db)):
+    return CustomerAuthService(db).refresh_access(body.refresh_token)
 
 
 @router.post("/forgot-password")
