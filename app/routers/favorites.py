@@ -7,6 +7,7 @@ from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.repositories.favorite_repo import FavoriteRepository
 from app.repositories.customer_repo import CustomerRepository
+from app.models.product import Product
 from app.schemas.favorite import FavoriteResponse
 
 router = APIRouter(prefix="/api/favorites", tags=["favorites"])
@@ -14,6 +15,21 @@ router = APIRouter(prefix="/api/favorites", tags=["favorites"])
 
 class FavoriteAdd(BaseModel):
     product_id: int
+
+
+def _with_product(db, favs):
+    out = []
+    for f in favs:
+        p = db.query(Product).filter(Product.id == f.product_id).first()
+        d = FavoriteResponse.model_validate(f).model_dump()
+        if p:
+            d["product_name"] = p.name
+            d["product_slug"] = p.slug
+            d["image_url"] = p.images[0].image_url if p.images else None
+            prices = [float(v.selling_price) for v in p.variants if v.selling_price is not None]
+            d["price"] = min(prices) if prices else None
+        out.append(d)
+    return out
 
 
 @router.get("/", response_model=list[FavoriteResponse])
@@ -24,7 +40,7 @@ def list_favorites(
     customer = CustomerRepository(db).get_by_user_id(user.id)
     if not customer:
         return []
-    return FavoriteRepository(db).list_by_customer(customer.id)
+    return _with_product(db, FavoriteRepository(db).list_by_customer(customer.id))
 
 
 @router.post("/", response_model=FavoriteResponse)

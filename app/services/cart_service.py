@@ -29,8 +29,11 @@ class CartService:
         if not variant or not variant.is_active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Variant not found")
         existing = self.cart_repo.get_item(cart_id, variant_id)
+        new_qty = existing.quantity + quantity if existing else quantity
+        if new_qty > variant.quantity:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Only {variant.quantity} available in stock")
         if existing:
-            self.cart_repo.update_item(existing, existing.quantity + quantity)
+            self.cart_repo.update_item(existing, new_qty)
         else:
             self.cart_repo.add_item(cart_id, variant_id, quantity)
         return self._build_cart(cart_id)
@@ -41,6 +44,9 @@ class CartService:
         item = self.db.query(CartItem).filter(CartItem.id == item_id, CartItem.cart_id == cart_id).first()
         if not item:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+        variant = self.variant_repo.get_by_id(item.variant_id)
+        if variant and quantity > variant.quantity:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Only {variant.quantity} available in stock")
         self.cart_repo.update_item(item, quantity)
         return self._build_cart(cart_id)
 
@@ -63,13 +69,19 @@ class CartService:
             price = float(variant.selling_price) if variant else 0
             name = ""
             image_url = ""
+            product_slug = ""
+            product_id = None
             if variant:
                 product = self.db.query(Product).filter(Product.id == variant.product_id).first()
                 name = product.name if product else ""
                 image_url = product.images[0].image_url if product and product.images else ""
+                product_slug = product.slug if product else ""
+                product_id = product.id if product else None
             result_items.append({
                 "id": item.id,
                 "variant_id": item.variant_id,
+                "product_id": product_id,
+                "product_slug": product_slug,
                 "quantity": item.quantity,
                 "price": price,
                 "product_name": name,
@@ -77,6 +89,8 @@ class CartService:
                 "image_url": image_url,
                 "size": variant.size if variant else None,
                 "color": variant.color if variant else None,
+                "color_hex": variant.color_rel.hex_value if variant and variant.color_rel else None,
+                "stock": variant.quantity if variant else 0,
                 "barcode": variant.barcode if variant else "",
             })
             total += price * item.quantity
