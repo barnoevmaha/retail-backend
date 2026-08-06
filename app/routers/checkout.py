@@ -25,6 +25,8 @@ class CheckoutRequest(BaseModel):
     address: str
     apartment: str | None = None
     delivery_note: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
 
 @router.post("/", response_model=OrderResponse)
@@ -64,6 +66,8 @@ def checkout(
         address=body.address,
         apartment=body.apartment,
         delivery_note=body.delivery_note,
+        latitude=body.latitude,
+        longitude=body.longitude,
     )
     response = order_svc.build_response(order)
 

@@ -37,6 +37,8 @@ class OrderResponse(BaseModel):
     shipping: float = 0
     items_count: int = 0
     delivery: list[str] = []
+    latitude: float | None = None
+    longitude: float | None = None
     created_at: datetime
     updated_at: datetime
     items: list[OrderItemResponse] = []

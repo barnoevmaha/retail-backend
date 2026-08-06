@@ -56,6 +56,8 @@ class OrderService:
             apartment=delivery.get("apartment"),
             delivery_note=delivery.get("delivery_note"),
             delivery_fee=delivery_fee,
+            latitude=delivery.get("latitude"),
+            longitude=delivery.get("longitude"),
         )
 
         for item in items:
@@ -141,6 +143,8 @@ class OrderService:
             "shipping": delivery_fee,
             "items_count": len(items),
             "delivery": delivery,
+            "latitude": float(order.latitude) if order.latitude is not None else None,
+            "longitude": float(order.longitude) if order.longitude is not None else None,
             "items": items,
             "created_at": order.created_at,
             "updated_at": order.updated_at,
