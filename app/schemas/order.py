@@ -33,6 +33,8 @@ class OrderResponse(BaseModel):
     apartment: str | None = None
     delivery_note: str | None = None
     delivery_fee: float = 0
+    discount: float = 0
+    promo_code: str | None = None
     subtotal: float = 0
     shipping: float = 0
     items_count: int = 0

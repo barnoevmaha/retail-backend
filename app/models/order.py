@@ -22,6 +22,8 @@ class Order(Base):
     apartment = Column(String(50))
     delivery_note = Column(String(1000))
     delivery_fee = Column(Numeric(12, 2), default=0, server_default="0")
+    discount_amount = Column(Numeric(12, 2), default=0, server_default="0")
+    promo_code = Column(String(50), nullable=True)
     latitude = Column(Numeric(10, 7))
     longitude = Column(Numeric(10, 7))
     created_at = Column(DateTime(timezone=True), server_default=func.now())

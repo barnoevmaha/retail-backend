@@ -9,7 +9,6 @@ from app.models.user import User
 from app.repositories.customer_repo import CustomerRepository
 from app.services.cart_service import CartService
 from app.services.order_service import OrderService
-from app.services.promotion_service import PromotionService
 from app.schemas.order import OrderResponse
 
 router = APIRouter(prefix="/api/checkout", tags=["checkout"])
@@ -75,6 +74,7 @@ def checkout(
         customer_id=customer_id,
         payment_method=body.payment_method,
         user=user,
+        promo_code=body.promo_code,
         full_name=body.full_name,
         phone=body.phone,
         city=body.city,
@@ -84,14 +84,4 @@ def checkout(
         latitude=body.latitude,
         longitude=body.longitude,
     )
-    response = order_svc.build_response(order)
-
-    if body.promo_code:
-        try:
-            promo_svc = PromotionService(db)
-            promo_svc.validate_code(body.promo_code, float(order.total_amount))
-            promo_svc.use_code(body.promo_code)
-        except Exception:
-            pass
-
-    return OrderResponse.model_validate(response)
+    return order_svc.build_response(order)

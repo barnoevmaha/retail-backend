@@ -23,7 +23,8 @@ class OrderService:
         self.audit = AuditService(db)
         self.receipt_service = ReceiptService(db)
 
-    def create_from_cart(self, cart_id: int, customer_id: int | None, payment_method: str | None, user: User | None = None, **delivery):
+    def create_from_cart(self, cart_id: int, customer_id: int | None, payment_method: str | None, user: User | None = None,
+                         promo_code: str | None = None, **delivery):
         from app.models.cart import CartItem
         from app.models.product import Product
 
@@ -42,7 +43,12 @@ class OrderService:
 
         subtotal = round(subtotal, 2)
         delivery_fee = delivery_fee_for(subtotal)
-        total = round(subtotal + delivery_fee, 2)
+        discount = 0.0
+        if promo_code:
+            from app.services.promotion_service import PromotionService
+            result = PromotionService(self.db).validate_code(promo_code, subtotal + delivery_fee)
+            discount = float(result["discount"])
+        total = round(max(subtotal + delivery_fee - discount, 0), 2)
 
         order = self.order_repo.create(
             customer_id=customer_id,
@@ -57,6 +63,8 @@ class OrderService:
             apartment=delivery.get("apartment"),
             delivery_note=delivery.get("delivery_note"),
             delivery_fee=delivery_fee,
+            discount_amount=discount,
+            promo_code=promo_code,
             latitude=delivery.get("latitude"),
             longitude=delivery.get("longitude"),
         )
@@ -67,6 +75,10 @@ class OrderService:
             self.stock_service.sale(item.variant_id, item.quantity, user or User(), order.id)
 
         self.cart_repo.clear_cart(cart_id)
+
+        if promo_code and discount > 0:
+            from app.services.promotion_service import PromotionService
+            PromotionService(self.db).use_code(promo_code)
 
         if customer_id:
             customer = self.customer_repo.get_by_id(customer_id)
@@ -140,6 +152,8 @@ class OrderService:
             "apartment": order.apartment,
             "delivery_note": order.delivery_note,
             "delivery_fee": delivery_fee,
+            "discount": float(order.discount_amount or 0),
+            "promo_code": order.promo_code,
             "subtotal": round(subtotal, 2),
             "shipping": delivery_fee,
             "items_count": len(items),
