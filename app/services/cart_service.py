@@ -6,6 +6,7 @@ from app.repositories.variant_repo import VariantRepository
 from app.models.cart import CartItem
 from app.models.variant import ProductVariant
 from app.models.product import Product
+from app.services.pricing import delivery_fee_for
 
 
 class CartService:
@@ -79,7 +80,7 @@ class CartService:
     def _build_cart(self, cart_id: int):
         items = self.db.query(CartItem).filter(CartItem.cart_id == cart_id).all()
         result_items = []
-        total = 0
+        subtotal = 0
         for item in items:
             variant = self.variant_repo.get_by_id(item.variant_id)
             price = float(variant.selling_price) if variant else 0
@@ -109,5 +110,8 @@ class CartService:
                 "stock": variant.quantity if variant else 0,
                 "barcode": variant.barcode if variant else "",
             })
-            total += price * item.quantity
-        return {"id": cart_id, "items": result_items, "total": round(total, 2)}
+            subtotal += price * item.quantity
+        subtotal = round(subtotal, 2)
+        delivery_fee = delivery_fee_for(subtotal)
+        return {"id": cart_id, "items": result_items, "subtotal": subtotal,
+                "delivery_fee": delivery_fee, "total": round(subtotal + delivery_fee, 2)}

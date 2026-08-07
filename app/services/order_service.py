@@ -9,6 +9,7 @@ from app.models.user import User
 from app.services.stock_service import StockService
 from app.services.audit_service import AuditService
 from app.services.receipt_service import ReceiptService
+from app.services.pricing import delivery_fee_for
 
 
 class OrderService:
@@ -39,8 +40,8 @@ class OrderService:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Insufficient stock for variant {variant.id}")
             subtotal += float(variant.selling_price) * item.quantity
 
-        # ponytail: flat fee, free above $500 — move to settings when pricing changes
-        delivery_fee = 0.0 if subtotal >= 500 else 10.0
+        subtotal = round(subtotal, 2)
+        delivery_fee = delivery_fee_for(subtotal)
         total = round(subtotal + delivery_fee, 2)
 
         order = self.order_repo.create(
