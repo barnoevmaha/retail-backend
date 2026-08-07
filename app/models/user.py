@@ -12,5 +12,7 @@ class User(Base):
     name = Column(String(255), nullable=True)
     role = Column(String(50), nullable=False, default="customer")
     is_active = Column(Boolean, default=True)
+    failed_login_attempts = Column(Integer, default=0)
+    locked_until = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
