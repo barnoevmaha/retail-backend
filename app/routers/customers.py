@@ -74,6 +74,7 @@ def get_customer(
 def create_customer(
     body: CustomerCreate,
     db: Session = Depends(get_db),
+    _: User = Depends(require_role("super_admin", "admin", "manager", "cashier")),
 ):
     repo = CustomerRepository(db)
     if repo.get_by_phone(body.phone):
