@@ -25,7 +25,7 @@ Business logic lives in services, never in routers. All quantity changes go thro
 | Variable | Default | Description |
 |----------|---------|-------------|
 | DATABASE_URL | postgresql://clothes_shop:clothes_shop@localhost:5432/clothes_shop | PostgreSQL connection string |
-| SECRET_KEY | dev-secret-key-change-in-production | JWT signing key |
+| SECRET_KEY | _(required — no default)_ | JWT signing key. Must be ≥32 chars, no placeholders. Generate: `python -c "import secrets; print(secrets.token_urlsafe(64))"` |
 | ALGORITHM | HS256 | JWT algorithm |
 | ACCESS_TOKEN_EXPIRE_MINUTES | 1440 | Token expiry |
 | REFRESH_TOKEN_EXPIRE_DAYS | 30 | Refresh token expiry |
