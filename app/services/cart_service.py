@@ -24,12 +24,16 @@ class CartService:
                 theirs = self.cart_repo.get_by_customer(customer_id)
                 if theirs and theirs.id != cart.id:
                     for item in theirs.items:
+                        variant = self.variant_repo.get_by_id(item.variant_id)
+                        if not variant or not variant.is_active:
+                            continue
                         existing = self.cart_repo.get_item(cart.id, item.variant_id)
                         if existing:
-                            self.cart_repo.update_item(existing, existing.quantity + item.quantity)
+                            self.cart_repo.update_item(existing, min(existing.quantity + item.quantity, variant.quantity))
                         else:
-                            self.cart_repo.add_item(cart.id, item.variant_id, item.quantity)
+                            self.cart_repo.add_item(cart.id, item.variant_id, min(item.quantity, variant.quantity))
                     self.cart_repo.clear_cart(theirs.id)
+                    self.cart_repo.delete_cart(theirs.id)
                     self.db.commit()
                 cart.customer_id = customer_id
                 self.db.commit()
