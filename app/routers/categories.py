@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import require_role
 from app.models.user import User
+from app.models.product import Product
 from app.repositories.category_repo import CategoryRepository
 from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from app.utils.slug import unique_slug
@@ -82,5 +83,9 @@ def delete_category(
     cat = repo.get_by_id(category_id)
     if not cat:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+    subtree = [cat.id] + [c.id for c in cat.children]
+    if db.query(Product).filter(Product.category_id.in_(subtree)).first():
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail="Category cannot be deleted because it (or a subcategory) still has products.")
     repo.delete(cat)
     return {"ok": True}

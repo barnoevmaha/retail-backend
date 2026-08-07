@@ -5,6 +5,7 @@ from app.core.database import get_db
 from app.core.dependencies import require_role
 from app.models.user import User
 from app.models.variant import ProductVariant
+from app.models.product_image import ProductImage
 from app.repositories.color_repo import ColorRepository
 from app.schemas.color import ColorCreate, ColorResponse
 
@@ -35,6 +36,7 @@ def delete_color(
     if not color:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Color not found")
     db.query(ProductVariant).filter(ProductVariant.color_id == color_id).update({"color_id": None})
+    db.query(ProductImage).filter(ProductImage.color_id == color_id).update({"color_id": None})
     db.delete(color)
     db.commit()
     return {"ok": True, "unlinked": True}

@@ -10,6 +10,14 @@ from app.repositories.product_image_repo import ProductImageRepository
 from app.repositories.color_repo import ColorRepository
 from app.repositories.size_repo import SizeRepository
 from app.models.user import User
+from app.models.order import OrderItem
+from app.models.stock_movement import StockMovement
+from app.models.adjustment import AdjustmentItem
+from app.models.receiving import ReceivingItem
+from app.models.returns import ReturnItem
+from app.models.writeoff import WriteOffItem
+from app.models.receipt import ReceiptItem
+from app.models.cart import CartItem
 from app.utils.barcode import generate_barcode
 from app.utils.slug import unique_slug
 from app.services.audit_service import AuditService
@@ -77,6 +85,28 @@ class ProductService:
         product = self.product_repo.get_by_id(product_id)
         if not product:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+
+        variant_ids = [v.id for v in product.variants]
+        if variant_ids:
+            historical = {
+                "order": OrderItem,
+                "stock movement": StockMovement,
+                "adjustment": AdjustmentItem,
+                "receiving": ReceivingItem,
+                "return": ReturnItem,
+                "write-off": WriteOffItem,
+                "receipt": ReceiptItem,
+            }
+            for label, model in historical.items():
+                if self.db.query(model).filter(model.variant_id.in_(variant_ids)).first():
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail=f"Product cannot be deleted — it is referenced by {label} records.",
+                    )
+            # Clean transient carts so the FK does not block deletion.
+            self.db.query(CartItem).filter(CartItem.variant_id.in_(variant_ids)).delete(synchronize_session=False)
+            self.db.flush()
+
         self.product_repo.delete(product)
         if user:
             self.audit.log("delete", "product", product_id, user, old_values={"name": product.name, "slug": product.slug})

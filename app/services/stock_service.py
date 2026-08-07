@@ -81,6 +81,9 @@ class StockService:
                        old_values={"operation": operation},
                        new_values={"quantity": variant.quantity, "change": quantity})
 
+        # Persist the movement explicitly within this session transaction.
+        self.db.commit()
+
         return movement
 
     def receive(self, variant_id: int, quantity: int, warehouse_id: int | None, user: User, reason: str | None = None, document_number: str | None = None):
@@ -133,7 +136,6 @@ class StockService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient stock")
 
         from_variant.quantity -= quantity
-        self.db.commit()
         self.stock_repo.create(
             variant_id=variant_id,
             warehouse_id=from_warehouse_id,
@@ -155,6 +157,7 @@ class StockService:
             reference_type="transfer_in",
             performed_by_name=user.email if user else None,
         )
+        self.db.commit()
         return True
 
     def get_movements(self, variant_id: int | None = None, operation: str | None = None, skip: int = 0, limit: int = 50):

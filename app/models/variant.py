@@ -24,6 +24,6 @@ class ProductVariant(Base):
     product = relationship("Product", back_populates="variants")
     color_rel = relationship("Color")
     size_rel = relationship("Size")
-    stock_movements = relationship("StockMovement", back_populates="variant", cascade="all, delete-orphan")
+    stock_movements = relationship("StockMovement", back_populates="variant")
     order_items = relationship("OrderItem", back_populates="variant")
     cart_items = relationship("CartItem", back_populates="variant")

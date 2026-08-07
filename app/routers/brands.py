@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import require_role
 from app.models.user import User
+from app.models.product import Product
 from app.repositories.brand_repo import BrandRepository
 from app.schemas.brand import BrandCreate, BrandUpdate, BrandResponse
 from app.utils.slug import unique_slug
@@ -86,5 +87,8 @@ def delete_brand(
     brand = repo.get_by_id(brand_id)
     if not brand:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brand not found")
+    if db.query(Product).filter(Product.brand_id == brand_id).first():
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail="Brand cannot be deleted because it still has products.")
     repo.delete(brand)
     return {"ok": True}
