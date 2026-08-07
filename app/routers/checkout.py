@@ -39,14 +39,15 @@ def checkout(
     x_session_key: str = Header(default=""),
     x_customer_id: str | None = Header(default=None),
 ):
-    # Authenticated customer identity from JWT wins; never trust a client-supplied customer_id
+    # Authenticated customer identity from JWT always wins; never trust a client-supplied customer_id.
+    # X-Customer-Id is honored ONLY for authenticated staff/POS (they create orders for walk-in customers);
+    # anonymous callers can never attribute an order to a customer they do not own.
     customer_id = customer.id if customer else None
-    if not customer_id and not customer:
-        if x_customer_id is not None:
-            try:
-                customer_id = int(x_customer_id)
-            except ValueError:
-                customer_id = None
+    if not customer_id and user and x_customer_id:
+        try:
+            customer_id = int(x_customer_id)
+        except ValueError:
+            customer_id = None
     if not customer_id and user:
         profile = CustomerRepository(db).get_by_user_id(user.id)
         if profile:
