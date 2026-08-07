@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -20,10 +20,10 @@ class CheckoutRequest(BaseModel):
     promo_code: str | None = None
     session_key: str | None = None
     customer_id: int | None = None
-    full_name: str
-    phone: str
-    city: str
-    address: str
+    full_name: str | None = None
+    phone: str | None = None
+    city: str | None = None
+    address: str | None = None
     apartment: str | None = None
     delivery_note: str | None = None
     latitude: float | None = None
@@ -39,19 +39,29 @@ def checkout(
     x_session_key: str = Header(default=""),
     x_customer_id: str | None = Header(default=None),
 ):
+    # Staff/POS sales are walk-in: no delivery fields required. Storefront checkout (customer or
+    # anonymous) must always provide delivery info, so enforce it here for non-staff callers.
+    is_staff = user is not None and user.role in ("super_admin", "admin", "manager", "cashier", "warehouse_employee")
+
     # Authenticated customer identity from JWT always wins; never trust a client-supplied customer_id.
-    # X-Customer-Id is honored ONLY for authenticated staff/POS (they create orders for walk-in customers);
-    # anonymous callers can never attribute an order to a customer they do not own.
+    # X-Customer-Id is honored ONLY for staff/POS (they create orders for walk-in customers);
+    # customer and anonymous callers can never attribute an order to a customer they do not own.
     customer_id = customer.id if customer else None
-    if not customer_id and user and x_customer_id:
+    if not customer_id and is_staff and x_customer_id:
         try:
             customer_id = int(x_customer_id)
         except ValueError:
             customer_id = None
-    if not customer_id and user:
+    if not customer_id and is_staff:
         profile = CustomerRepository(db).get_by_user_id(user.id)
         if profile:
             customer_id = profile.id
+
+    if not is_staff:
+        missing = [f for f in ("full_name", "phone", "city", "address") if not getattr(body, f)]
+        if missing:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                                detail=f"Missing required delivery fields: {', '.join(missing)}")
 
     cart_svc = CartService(db)
     cart = cart_svc.get_or_create_cart(
