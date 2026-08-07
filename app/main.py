@@ -1,13 +1,11 @@
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.core.database import engine
 from app.core.config import settings
-from app.core.dependencies import require_role
-from app.models.user import User
 from app.routers import auth, users, products, variants, categories, brands, warehouse, customers, cart, checkout, orders, reviews, favorites, promotions, sms, analytics, suppliers, receiving, returns, writeoffs, adjustments, product_images, colors, sizes, audit_logs, notifications, pos_sessions, inventory_history, barcode_generator, receipts, settings as settings_router, company, export as export_data, customer_auth, customer_account, customer_orders, translations
 
 
@@ -101,41 +99,3 @@ app.include_router(translations.router)
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
-
-
-@app.get("/api/debug/admin-exists")
-def debug_admin_exists(_: User = Depends(require_role("super_admin"))):
-    from app.core.database import SessionLocal
-    from app.repositories.user_repo import UserRepository
-    db = SessionLocal()
-    try:
-        admin = UserRepository(db).get_by_email(settings.super_admin_email)
-        return {"exists": admin is not None, "email": settings.super_admin_email, "verified": admin is not None and admin.is_active}
-    finally:
-        db.close()
-
-
-@app.get("/api/debug/users")
-def debug_users(_: User = Depends(require_role("super_admin"))):
-    from app.core.database import SessionLocal
-    from app.repositories.user_repo import UserRepository
-    db = SessionLocal()
-    try:
-        users = UserRepository(db).list_all()
-        return [{"id": u.id, "email": u.email, "role": u.role, "active": u.is_active} for u in users]
-    finally:
-        db.close()
-
-
-@app.get("/api/debug/admin")
-def debug_admin(_: User = Depends(require_role("super_admin"))):
-    from app.core.database import SessionLocal
-    from app.repositories.user_repo import UserRepository
-    db = SessionLocal()
-    try:
-        admin = UserRepository(db).get_by_email(settings.super_admin_email)
-        if not admin:
-            return {"exists": False, "email": settings.super_admin_email, "role": None, "password_hash_exists": False}
-        return {"exists": True, "email": admin.email, "role": admin.role, "password_hash_exists": bool(admin.password_hash)}
-    finally:
-        db.close()
