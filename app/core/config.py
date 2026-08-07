@@ -1,9 +1,10 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     database_url: str = "postgresql://clothes_shop:clothes_shop@localhost:5432/clothes_shop"
-    secret_key: str = "dev-secret-key-change-in-production"
+    secret_key: str = ""
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 1440
     cors_origins: str = "*"
@@ -46,6 +47,28 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+
+    @field_validator("secret_key")
+    @classmethod
+    def secret_key_must_be_strong(cls, v: str) -> str:
+        v = (v or "").strip()
+        placeholders = {
+            "dev-secret-key-change-in-production",
+            "change-this-in-production",
+            "changeme",
+            "secret",
+            "your-secret-key",
+            "replace-me",
+        }
+        if not v or v.lower() in placeholders or len(v) < 32:
+            raise ValueError(
+                "SECRET_KEY is missing, a known placeholder, or too short (<32 chars). "
+                "Generate a strong random value, e.g.: "
+                "python -c \"import secrets; print(secrets.token_urlsafe(64))\" "
+                "and set it via environment variable or .env (see .env.example). "
+                "The app refuses to start without it."
+            )
+        return v
 
 
 settings = Settings()
