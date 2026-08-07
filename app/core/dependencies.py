@@ -57,6 +57,31 @@ def require_role(*roles: str):
     return checker
 
 
+def optional_current_customer(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+) -> Customer | None:
+    if credentials is None:
+        return None
+    try:
+        payload = decode_access_token(credentials.credentials)
+    except Exception:
+        return None
+    if payload is None:
+        return None
+    sub = payload.get("sub", "")
+    if not sub.startswith("customer_"):
+        return None
+    try:
+        customer_id = int(sub.removeprefix("customer_"))
+    except ValueError:
+        return None
+    customer = CustomerRepository(db).get_by_id(customer_id)
+    if not customer or customer.is_blocked:
+        return None
+    return customer
+
+
 def get_current_customer(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: Session = Depends(get_db),

@@ -112,7 +112,7 @@ def receipt_history(
 
 
 @router.get("/{receipt_id}")
-def view_receipt(receipt_id: int, db: Session = Depends(get_db)):
+def view_receipt(receipt_id: int, db: Session = Depends(get_db), _: User = Depends(require_role("super_admin", "admin", "manager", "cashier"))):
     receipt, items = _get_receipt_data(db, receipt_id)
     if not receipt:
         return HTMLResponse("<h1>Receipt not found</h1>", status_code=404)
@@ -121,7 +121,7 @@ def view_receipt(receipt_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{receipt_id}/download")
-def download_receipt(receipt_id: int, db: Session = Depends(get_db)):
+def download_receipt(receipt_id: int, db: Session = Depends(get_db), _: User = Depends(require_role("super_admin", "admin", "manager", "cashier"))):
     receipt, items = _get_receipt_data(db, receipt_id)
     if not receipt:
         return HTMLResponse("<h1>Receipt not found</h1>", status_code=404)

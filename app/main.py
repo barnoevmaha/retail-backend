@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.core.database import engine
 from app.core.config import settings
+from app.core.dependencies import require_role
+from app.models.user import User
 from app.routers import auth, users, products, variants, categories, brands, warehouse, customers, cart, checkout, orders, reviews, favorites, promotions, sms, analytics, suppliers, receiving, returns, writeoffs, adjustments, product_images, colors, sizes, audit_logs, notifications, pos_sessions, inventory_history, barcode_generator, receipts, settings as settings_router, company, export as export_data, customer_auth, customer_account, customer_orders, translations
 
 
@@ -102,7 +104,7 @@ def health():
 
 
 @app.get("/api/debug/admin-exists")
-def debug_admin_exists():
+def debug_admin_exists(_: User = Depends(require_role("super_admin"))):
     from app.core.database import SessionLocal
     from app.repositories.user_repo import UserRepository
     db = SessionLocal()
@@ -114,7 +116,7 @@ def debug_admin_exists():
 
 
 @app.get("/api/debug/users")
-def debug_users():
+def debug_users(_: User = Depends(require_role("super_admin"))):
     from app.core.database import SessionLocal
     from app.repositories.user_repo import UserRepository
     db = SessionLocal()
@@ -126,7 +128,7 @@ def debug_users():
 
 
 @app.get("/api/debug/admin")
-def debug_admin():
+def debug_admin(_: User = Depends(require_role("super_admin"))):
     from app.core.database import SessionLocal
     from app.repositories.user_repo import UserRepository
     db = SessionLocal()

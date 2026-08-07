@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
@@ -39,7 +39,13 @@ def list_orders(
 
 
 @router.get("/{order_id}")
-def get_order(order_id: int, db: Session = Depends(get_db)):
+def get_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    if user.role not in ("super_admin", "admin", "manager", "cashier"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
     return OrderService(db).build_response(OrderService(db).get_order(order_id))
 
 
@@ -54,7 +60,7 @@ def update_order_status(
 
 
 @router.get("/{order_id}/receipt", response_class=HTMLResponse)
-def receipt(order_id: int, db: Session = Depends(get_db)):
+def receipt(order_id: int, db: Session = Depends(get_db), _: User = Depends(require_role("super_admin", "admin", "manager", "cashier"))):
     order = OrderService(db).get_order(order_id)
     items = (
         db.query(OrderItem)

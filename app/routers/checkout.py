@@ -3,7 +3,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.dependencies import optional_current_user
+from app.core.dependencies import optional_current_customer, optional_current_user
+from app.models.customer import Customer
 from app.models.user import User
 from app.repositories.customer_repo import CustomerRepository
 from app.services.cart_service import CartService
@@ -34,19 +35,22 @@ def checkout(
     body: CheckoutRequest,
     db: Session = Depends(get_db),
     user: User | None = Depends(optional_current_user),
+    customer: Customer | None = Depends(optional_current_customer),
     x_session_key: str = Header(default=""),
     x_customer_id: str | None = Header(default=None),
 ):
-    customer_id = body.customer_id
-    if not customer_id and x_customer_id is not None:
-        try:
-            customer_id = int(x_customer_id)
-        except ValueError:
-            customer_id = None
+    # Authenticated customer identity from JWT wins; never trust a client-supplied customer_id
+    customer_id = customer.id if customer else None
+    if not customer_id and not customer:
+        if x_customer_id is not None:
+            try:
+                customer_id = int(x_customer_id)
+            except ValueError:
+                customer_id = None
     if not customer_id and user:
-        customer = CustomerRepository(db).get_by_user_id(user.id)
-        if customer:
-            customer_id = customer.id
+        profile = CustomerRepository(db).get_by_user_id(user.id)
+        if profile:
+            customer_id = profile.id
 
     cart_svc = CartService(db)
     cart = cart_svc.get_or_create_cart(
