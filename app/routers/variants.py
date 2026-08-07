@@ -29,6 +29,7 @@ def list_variants(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db),
+    _: User = Depends(require_role("super_admin", "admin", "manager", "cashier", "warehouse_employee")),
 ):
     repo = VariantRepository(db)
     if q:
@@ -41,14 +42,14 @@ def list_variants(
 
 
 @router.get("/barcode/{barcode}")
-def get_by_barcode(barcode: str, db: Session = Depends(get_db)):
+def get_by_barcode(barcode: str, db: Session = Depends(get_db), _: User = Depends(require_role("super_admin", "admin", "manager", "cashier", "warehouse_employee"))):
     service = ProductService(db)
     variant = service.get_variant_by_barcode(barcode)
     return _enrich(variant)
 
 
 @router.get("/{variant_id}")
-def get_variant(variant_id: int, db: Session = Depends(get_db)):
+def get_variant(variant_id: int, db: Session = Depends(get_db), _: User = Depends(require_role("super_admin", "admin", "manager", "cashier", "warehouse_employee"))):
     repo = VariantRepository(db)
     variant = repo.get_by_id(variant_id)
     if not variant:

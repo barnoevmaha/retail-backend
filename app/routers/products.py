@@ -16,6 +16,7 @@ def _with_color_info(d: dict, p) -> dict:
     hex_by_id = {v.id: v.color_rel.hex_value if v.color_rel else None for v in p.variants}
     name_by_id = {v.id: v.color_rel.name if v.color_rel else None for v in p.variants}
     for vd in d["variants"]:
+        vd.pop("purchase_price", None)
         vd["color_hex"] = hex_by_id.get(vd["id"])
         vd["color_name"] = vd.get("color_name") or name_by_id.get(vd["id"])
     return d

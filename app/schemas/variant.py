@@ -46,3 +46,25 @@ class VariantResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class PublicVariantResponse(BaseModel):
+    """Customer-facing variant view — never includes internal purchase_price."""
+    id: int
+    product_id: int
+    barcode: str
+    sku: str
+    color_id: int | None
+    size_id: int | None
+    size: str | None
+    color: str | None
+    selling_price: float
+    quantity: int
+    is_active: bool
+    created_at: datetime
+    color_name: str | None = None
+    size_name: str | None = None
+    color_hex: str | None = None
+
+    class Config:
+        from_attributes = True

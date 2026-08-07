@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from app.schemas.slug import SluggedBase
-from app.schemas.variant import VariantResponse
+from app.schemas.variant import PublicVariantResponse
 from app.schemas.product_image import ProductImageResponse
 
 
@@ -31,7 +31,7 @@ class ProductResponse(BaseModel):
     category_name: str | None = None
     category_slug: str | None = None
     brand_name: str | None = None
-    variants: list[VariantResponse] = []
+    variants: list[PublicVariantResponse] = []
     images: list[ProductImageResponse] = []
     is_active: bool
     created_at: datetime
