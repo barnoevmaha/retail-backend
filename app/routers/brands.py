@@ -1,20 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from sqlalchemy.orm import Session
-from pathlib import Path
-import uuid
 
 from app.core.database import get_db
-from app.core.config import settings
 from app.core.dependencies import require_role
 from app.models.user import User
 from app.repositories.brand_repo import BrandRepository
 from app.schemas.brand import BrandCreate, BrandUpdate, BrandResponse
 from app.utils.slug import unique_slug
+from app.utils.uploads import save_uploaded_image
 
 router = APIRouter(prefix="/api/brands", tags=["brands"])
-
-UPLOAD_DIR = Path(settings.upload_dir)
-UPLOAD_DIR.mkdir(exist_ok=True)
 
 
 @router.post("/{brand_id}/logo", response_model=BrandResponse)
@@ -28,10 +23,8 @@ def upload_logo(
     brand = repo.get_by_id(brand_id)
     if not brand:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brand not found")
-    ext = Path(file.filename).suffix if file.filename else ".png"
-    filename = f"brand-{uuid.uuid4().hex}{ext}"
-    (UPLOAD_DIR / filename).write_bytes(file.file.read())
-    return repo.update(brand, logo=f"/uploads/{filename}")
+    logo = save_uploaded_image(file)
+    return repo.update(brand, logo=logo)
 
 
 @router.get("/", response_model=list[BrandResponse])

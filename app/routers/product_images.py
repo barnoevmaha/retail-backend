@@ -1,5 +1,4 @@
 import os
-import uuid
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
@@ -7,14 +6,11 @@ from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
 
 from app.core.database import get_db
-from app.core.config import settings
 from app.core.dependencies import require_role
 from app.models.user import User
 from app.schemas.product_image import ProductImageCreate, ProductImageResponse, ProductImageUpdate as ProductImageUpdateSchema
 from app.repositories.product_image_repo import ProductImageRepository
-
-UPLOAD_DIR = Path(settings.upload_dir)
-UPLOAD_DIR.mkdir(exist_ok=True)
+from app.utils.uploads import save_uploaded_image, UPLOAD_DIR
 
 router = APIRouter(prefix="/api/products/{product_id}/images", tags=["product_images"])
 
@@ -44,12 +40,8 @@ def upload_image(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("super_admin", "admin", "manager")),
 ):
-    ext = Path(file.filename).suffix if file.filename else ".jpg"
-    filename = f"{uuid.uuid4().hex}{ext}"
-    filepath = UPLOAD_DIR / filename
-    content = file.file.read()
-    filepath.write_bytes(content)
-    image_url = f"/uploads/{filename}"
+    filename = save_uploaded_image(file)
+    image_url = filename
     return ProductImageRepository(db).create(product_id, image_url, sort_order, is_main, color_id)
 
 

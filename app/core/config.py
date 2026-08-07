@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     frontend_url: str = ""
     admin_url: str = ""
     upload_dir: str = "uploads"
+    max_upload_size_bytes: int = 5 * 1024 * 1024
     sms_provider: str = "mock"
     telegram_bot_token: str = ""
     refresh_token_expire_days: int = 30

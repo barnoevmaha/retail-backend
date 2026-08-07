@@ -37,7 +37,16 @@ app = FastAPI(title=settings.company_name + " API", lifespan=lifespan)
 
 import os
 os.makedirs(settings.upload_dir, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
+
+
+class NoSniffStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
+
+
+app.mount("/uploads", NoSniffStaticFiles(directory=settings.upload_dir), name="uploads")
 
 origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
 if origins == ["*"]:
