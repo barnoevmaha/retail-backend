@@ -65,6 +65,10 @@ def checkout(
         if missing:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                                 detail=f"Missing required delivery fields: {', '.join(missing)}")
+        digits = sum(c.isdigit() for c in (body.phone or ""))
+        if digits < 4:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                                detail="Phone must contain at least 4 digits")
 
     cart_svc = CartService(db)
     cart = cart_svc.get_or_create_cart(

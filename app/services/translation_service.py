@@ -9,6 +9,12 @@ from app.services.translation_provider import TranslationProvider, get_translati
 
 logger = logging.getLogger(__name__)
 
+MAX_LEN = 500  # matches translations.key/en/ru/uz column lengths
+
+
+def _clamp(text: str) -> str:
+    return text[:MAX_LEN]
+
 
 class TranslationService:
     """Resolves UI strings via memory cache -> database -> translation API."""
@@ -26,7 +32,7 @@ class TranslationService:
 
     def ensure(self, db: Session, texts: list[str]) -> dict[str, dict]:
         """Return translations for every text; translate + persist the missing ones."""
-        texts = list(dict.fromkeys(t for t in (x.strip() for x in texts) if t))
+        texts = list(dict.fromkeys(_clamp(t.strip()) for t in texts if t.strip()))
         if not texts:
             return {}
 
@@ -94,6 +100,6 @@ class TranslationService:
                     logger.warning("Translation provider %s failed for %s: %s", provider.name, lang, e)
                     continue
                 for key, value in zip(texts, translated):
-                    entries[key][lang] = value or key
+                    entries[key][lang] = _clamp(value) if value else key
                 break
         return entries
