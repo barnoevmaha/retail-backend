@@ -55,6 +55,7 @@ class OrderService:
             user_id=user.id if user else None,
             total_amount=total,
             payment_method=payment_method,
+            payment_status="pending",  # never auto-confirmed; no gateway is integrated
             status="pending",
             customer_name=delivery.get("full_name"),
             customer_phone=delivery.get("phone"),

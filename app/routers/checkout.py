@@ -14,8 +14,12 @@ from app.schemas.order import OrderResponse
 router = APIRouter(prefix="/api/checkout", tags=["checkout"])
 
 
+# No online payment gateway is integrated. Every order is placed with
+# payment_status=pending and must be confirmed manually by staff after the
+# customer pays (cash / bank transfer / manual card handling). "card" is
+# treated the same as any manual method: it is NEVER auto-confirmed.
 class CheckoutRequest(BaseModel):
-    payment_method: str = "card"
+    payment_method: str = "manual"
     promo_code: str | None = None
     session_key: str | None = None
     customer_id: int | None = None
